@@ -179,6 +179,33 @@ describe('RoomsGateway', () => {
     }
   });
 
+  it('frees a slot on disconnect so another participant can join', async () => {
+    const roomId = 'slot-free-01';
+    const names = ['Анна', 'Борис', 'Вика', 'Глеб'];
+    for (const displayName of names) {
+      const occupant = await openSocket();
+      const ack = await joinRoom(occupant, { roomId, displayName });
+      expect(ack.ok).toBe(true);
+    }
+    expect(api.registry.get(parseRoomId(roomId))?.participantCount).toBe(4);
+
+    const fifth = await openSocket();
+    const full = await joinRoom(fifth, { roomId, displayName: 'Даша' });
+    expect(full.ok).toBe(false);
+    if (!full.ok) {
+      expect(full.error.code).toBe('ROOM_FULL');
+    }
+
+    sockets[3]?.disconnect();
+    await waitUntil(
+      () => api.registry.get(parseRoomId(roomId))?.participantCount === 3,
+    );
+
+    const retry = await joinRoom(fifth, { roomId, displayName: 'Даша' });
+    expect(retry.ok).toBe(true);
+    expect(api.registry.get(parseRoomId(roomId))?.participantCount).toBe(4);
+  });
+
   async function openSocket(): Promise<Socket> {
     const socket = io(api.origin, {
       path: '/socket.io',

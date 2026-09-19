@@ -12,20 +12,25 @@ import { useParams } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
 import { validateDisplayName } from '../features/enter-room/model/display-name-rules';
 import { useDisplayName } from '../features/enter-room/model/display-name.store';
+import { isWebRtcSupported } from '../features/enter-room/model/webrtc-support';
 import { ConnectingIndicator } from '../features/enter-room/ui/connecting-indicator';
 import { DisplayNameField } from '../features/enter-room/ui/display-name-field';
 import { RoomFullState } from '../features/enter-room/ui/room-full-state';
+import { ServerError } from '../features/enter-room/ui/server-error';
+import { WebrtcUnsupported } from '../features/enter-room/ui/webrtc-unsupported';
 import { ChatPanel } from '../widgets/chat-panel';
 import { ControlBar } from '../widgets/control-bar';
 import { ParticipantList } from '../widgets/participant-list';
 import { VideoGrid } from '../widgets/video-grid';
 import { EnableSoundButton } from '../features/meeting-session/ui/enable-sound-button';
+import { MediaPermissionAlert } from '../features/meeting-session/ui/media-permission-alert';
 import { captureEntryGesture } from '../features/meeting-session/model/autoplay';
 import { joinMeeting } from '../features/meeting-session/model/join-meeting';
 import {
   setMeetingConnection,
   useMeetingSession,
 } from '../features/meeting-session/model/meeting-session.store';
+import { useSocketLifecycle } from '../features/meeting-session/model/socket-lifecycle';
 import { useSessionTeardown } from '../features/meeting-session/model/teardown-session';
 import { useMeshCall } from '../features/meeting-session/model/use-mesh-call';
 
@@ -34,10 +39,11 @@ export function RoomPage() {
   const displayName = useDisplayName();
   const session = useMeetingSession();
   const validation = validateDisplayName(displayName);
+  const webrtcSupported = isWebRtcSupported();
 
   async function onJoin(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
-    if (!validation.ok) {
+    if (!validation.ok || !webrtcSupported) {
       return;
     }
     captureEntryGesture();
@@ -75,26 +81,27 @@ export function RoomPage() {
           <CardTitle>Войти в комнату</CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="flex flex-col gap-4" onSubmit={onJoin}>
-            {session.connection.status === 'service-full' ? (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  {russianMessages.SERVICE_AT_CAPACITY}
-                </AlertDescription>
-              </Alert>
-            ) : null}
-            {session.connection.status === 'server-error' ? (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  {russianMessages.SERVER_UNREACHABLE}
-                </AlertDescription>
-              </Alert>
-            ) : null}
-            <DisplayNameField />
-            <Button type="submit" disabled={!validation.ok}>
-              Войти
-            </Button>
-          </form>
+          {!webrtcSupported ||
+          session.connection.status === 'webrtc-unsupported' ? (
+            <WebrtcUnsupported />
+          ) : (
+            <form className="flex flex-col gap-4" onSubmit={onJoin}>
+              {session.connection.status === 'service-full' ? (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    {russianMessages.SERVICE_AT_CAPACITY}
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+              {session.connection.status === 'server-error' ? (
+                <ServerError />
+              ) : null}
+              <DisplayNameField />
+              <Button type="submit" disabled={!validation.ok}>
+                Войти
+              </Button>
+            </form>
+          )}
         </CardContent>
       </Card>
     </main>
@@ -115,6 +122,7 @@ function InRoomLayout() {
   const session = useMeetingSession();
   useMeshCall();
   useSessionTeardown();
+  useSocketLifecycle();
 
   if (session.connection.status !== 'in-room') {
     return null;
@@ -131,6 +139,7 @@ function InRoomLayout() {
   return (
     <main className="flex min-h-screen bg-background text-foreground">
       <div className="relative flex min-h-screen min-w-0 flex-1 flex-col">
+        {session.mediaPermissionDenied ? <MediaPermissionAlert /> : null}
         <VideoGrid
           self={self}
           remotes={remotes}
@@ -138,6 +147,7 @@ function InRoomLayout() {
           localCameraEnabled={session.localCameraEnabled}
           localMicrophoneEnabled={session.localMicrophoneEnabled}
           remoteStreams={session.remoteStreams}
+          peerStates={session.peerStates}
         />
         <EnableSoundButton />
         <ControlBar />

@@ -1,5 +1,10 @@
-import type { ParticipantDto } from '@fedora-meetings/contracts-realtime';
+import { russianMessages, type ParticipantDto } from '@fedora-meetings/contracts-realtime';
 import { useEffect, useRef } from 'react';
+import {
+  isFailedPeerMedia,
+  resolvePeerConnectionState,
+  type PeerConnectionState,
+} from '../model/peer-connection-state';
 import { MediaIndicators } from './media-indicators';
 import { ParticipantName } from './participant-name';
 import { ParticipantSilhouette } from './participant-silhouette';
@@ -7,14 +12,19 @@ import { ParticipantSilhouette } from './participant-silhouette';
 export function RemoteTile({
   participant,
   stream,
+  peerState,
   onAutoplayBlocked,
 }: {
   participant: ParticipantDto;
   stream: MediaStream | undefined;
+  peerState: PeerConnectionState | undefined;
   onAutoplayBlocked: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const showVideo = participant.cameraEnabled && hasLiveVideo(stream);
+  const resolvedState = resolvePeerConnectionState(peerState);
+  const mediaFailed = isFailedPeerMedia(peerState);
+  const showVideo =
+    !mediaFailed && participant.cameraEnabled && hasLiveVideo(stream);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -31,8 +41,11 @@ export function RemoteTile({
   }, [stream, onAutoplayBlocked]);
 
   return (
-    <article className="relative min-h-64 overflow-hidden rounded-lg bg-card">
-      {stream ? (
+    <article
+      className="relative min-h-64 overflow-hidden rounded-lg bg-card"
+      data-peer-state={resolvedState}
+    >
+      {stream && !mediaFailed ? (
         <video
           ref={videoRef}
           className={
@@ -46,8 +59,13 @@ export function RemoteTile({
         />
       ) : null}
       {!showVideo ? (
-        <div className="flex min-h-64 h-full w-full items-center justify-center bg-secondary">
+        <div className="flex min-h-64 h-full w-full flex-col items-center justify-center gap-2 bg-secondary p-4">
           <ParticipantSilhouette className="h-20 w-20" />
+          {mediaFailed ? (
+            <p className="text-center text-sm text-foreground">
+              {russianMessages.PEER_MEDIA_FAILED}
+            </p>
+          ) : null}
         </div>
       ) : null}
       <MediaIndicators

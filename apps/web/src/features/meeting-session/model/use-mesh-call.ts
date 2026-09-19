@@ -12,6 +12,7 @@ import {
   clearMeetingMedia,
   getMeetingSessionSnapshot,
   removePeerMedia,
+  setMediaPermissionDenied,
   setPeerMediaState,
   setRemoteStream,
   useMeetingSession,
@@ -62,6 +63,7 @@ export function useMeshCall(): void {
         localMedia.release();
         return;
       }
+      setMediaPermissionDenied(media.permissionDenied);
       mesh.attachLocal(media.stream);
       publishLocalMedia(media);
       if (cancelled) {

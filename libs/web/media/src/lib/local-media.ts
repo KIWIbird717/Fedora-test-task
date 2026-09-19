@@ -2,6 +2,7 @@ export type LocalMediaState = {
   stream: MediaStream;
   microphoneEnabled: boolean;
   cameraEnabled: boolean;
+  permissionDenied: boolean;
 };
 
 export type LocalMediaDeviceLostHandler = (
@@ -11,6 +12,7 @@ export type LocalMediaDeviceLostHandler = (
 
 export class LocalMedia {
   private current: LocalMediaState | undefined;
+  private permissionDenied = false;
   private readonly deviceLostHandlers = new Set<LocalMediaDeviceLostHandler>();
 
   onDeviceLost(handler: LocalMediaDeviceLostHandler): () => void {
@@ -24,9 +26,10 @@ export class LocalMedia {
     if (this.current) {
       return this.current;
     }
-    const stream = await acquireUserMedia();
-    this.current = snapshotFromStream(stream);
-    this.bindTracks(stream);
+    const acquired = await acquireUserMedia();
+    this.permissionDenied = acquired.permissionDenied;
+    this.current = snapshotFromStream(acquired.stream, this.permissionDenied);
+    this.bindTracks(acquired.stream);
     return this.current;
   }
 
@@ -43,14 +46,23 @@ export class LocalMedia {
       return this.current;
     }
     const extra = await tryGetUserMedia({ audio: true, video: false });
-    const acquired = extra?.getAudioTracks()[0];
+    this.permissionDenied = this.permissionDenied || extra.permissionDenied;
+    const acquired = extra.stream?.getAudioTracks()[0];
     if (!acquired) {
-      this.current = { ...state, microphoneEnabled: false };
+      this.current = {
+        ...state,
+        microphoneEnabled: false,
+        permissionDenied: this.permissionDenied,
+      };
       return this.current;
     }
     state.stream.addTrack(acquired);
     this.bindTrack(acquired);
-    this.current = { ...state, microphoneEnabled: true };
+    this.current = {
+      ...state,
+      microphoneEnabled: true,
+      permissionDenied: this.permissionDenied,
+    };
     return this.current;
   }
 
@@ -66,19 +78,33 @@ export class LocalMedia {
       return this.current;
     }
     const extra = await tryGetUserMedia({ audio: false, video: true });
-    const acquired = extra?.getVideoTracks()[0];
+    this.permissionDenied = this.permissionDenied || extra.permissionDenied;
+    const acquired = extra.stream?.getVideoTracks()[0];
     if (!acquired) {
-      this.current = { ...state, cameraEnabled: false };
+      this.current = {
+        ...state,
+        cameraEnabled: false,
+        permissionDenied: this.permissionDenied,
+      };
       return this.current;
     }
     state.stream.addTrack(acquired);
     this.bindTrack(acquired);
-    this.current = { ...state, cameraEnabled: true };
+    this.current = {
+      ...state,
+      cameraEnabled: true,
+      permissionDenied: this.permissionDenied,
+    };
     return this.current;
+  }
+
+  stopAll(): void {
+    this.release();
   }
 
   release(): void {
     if (!this.current) {
+      this.permissionDenied = false;
       return;
     }
     for (const track of [...this.current.stream.getTracks()]) {
@@ -86,6 +112,7 @@ export class LocalMedia {
       track.stop();
     }
     this.current = undefined;
+    this.permissionDenied = false;
   }
 
   private async ensureAcquired(): Promise<LocalMediaState> {
@@ -123,7 +150,7 @@ export class LocalMedia {
       return;
     }
     stream.removeTrack(track);
-    this.current = snapshotFromStream(stream);
+    this.current = snapshotFromStream(stream, this.permissionDenied);
     const kind = track.kind === 'audio' ? 'audio' : 'video';
     for (const handler of this.deviceLostHandlers) {
       handler(kind, this.current);
@@ -133,42 +160,84 @@ export class LocalMedia {
 
 export const localMedia = new LocalMedia();
 
-async function acquireUserMedia(): Promise<MediaStream> {
+type UserMediaAttempt = {
+  stream: MediaStream | undefined;
+  permissionDenied: boolean;
+};
+
+async function acquireUserMedia(): Promise<{
+  stream: MediaStream;
+  permissionDenied: boolean;
+}> {
   const both = await tryGetUserMedia({ audio: true, video: true });
-  if (both) {
-    return both;
+  if (both.stream) {
+    return { stream: both.stream, permissionDenied: false };
   }
   const audioOnly = await tryGetUserMedia({ audio: true, video: false });
-  if (audioOnly) {
-    return audioOnly;
+  if (audioOnly.stream) {
+    return {
+      stream: audioOnly.stream,
+      permissionDenied: both.permissionDenied || audioOnly.permissionDenied,
+    };
   }
   const videoOnly = await tryGetUserMedia({ audio: false, video: true });
-  if (videoOnly) {
-    return videoOnly;
+  if (videoOnly.stream) {
+    return {
+      stream: videoOnly.stream,
+      permissionDenied:
+        both.permissionDenied ||
+        audioOnly.permissionDenied ||
+        videoOnly.permissionDenied,
+    };
   }
-  return new MediaStream();
+  return {
+    stream: new MediaStream(),
+    permissionDenied:
+      both.permissionDenied ||
+      audioOnly.permissionDenied ||
+      videoOnly.permissionDenied,
+  };
 }
 
 async function tryGetUserMedia(
   constraints: MediaStreamConstraints,
-): Promise<MediaStream | undefined> {
+): Promise<UserMediaAttempt> {
   const mediaDevices =
     typeof navigator === 'undefined' ? undefined : navigator.mediaDevices;
   if (!mediaDevices?.getUserMedia) {
-    return undefined;
+    return { stream: undefined, permissionDenied: false };
   }
   try {
-    return await mediaDevices.getUserMedia(constraints);
-  } catch {
-    return undefined;
+    return {
+      stream: await mediaDevices.getUserMedia(constraints),
+      permissionDenied: false,
+    };
+  } catch (error) {
+    return {
+      stream: undefined,
+      permissionDenied: isNotAllowedError(error),
+    };
   }
 }
 
-function snapshotFromStream(stream: MediaStream): LocalMediaState {
+function isNotAllowedError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'name' in error &&
+    (error as { name: string }).name === 'NotAllowedError'
+  );
+}
+
+function snapshotFromStream(
+  stream: MediaStream,
+  permissionDenied: boolean,
+): LocalMediaState {
   return {
     stream,
     microphoneEnabled: isTransmitting(stream, 'audio'),
     cameraEnabled: isTransmitting(stream, 'video'),
+    permissionDenied,
   };
 }
 

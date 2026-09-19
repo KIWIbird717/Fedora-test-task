@@ -1,5 +1,6 @@
 import { russianMessages, type ParticipantDto } from '@fedora-meetings/contracts-realtime';
 import { cn } from '@fedora-meetings/web-ui';
+import type { PeerConnectionState } from '../../../entities/participant/model/peer-connection-state';
 import { RemoteTile } from '../../../entities/participant/ui/remote-tile';
 import { SelfView } from '../../../entities/participant/ui/self-view';
 import { markRemoteAudioBlocked } from '../../../features/meeting-session/model/autoplay';
@@ -11,6 +12,7 @@ export function VideoGrid({
   localCameraEnabled,
   localMicrophoneEnabled,
   remoteStreams,
+  peerStates,
 }: {
   self: ParticipantDto | undefined;
   remotes: ParticipantDto[];
@@ -18,6 +20,7 @@ export function VideoGrid({
   localCameraEnabled: boolean;
   localMicrophoneEnabled: boolean;
   remoteStreams: Record<string, MediaStream>;
+  peerStates: Record<string, PeerConnectionState>;
 }) {
   const isAlone = remotes.length === 0;
 
@@ -44,6 +47,7 @@ export function VideoGrid({
               key={participant.id}
               participant={participant}
               stream={remoteStreams[participant.id]}
+              peerState={peerStates[participant.id]}
               onAutoplayBlocked={markRemoteAudioBlocked}
             />
           ))}

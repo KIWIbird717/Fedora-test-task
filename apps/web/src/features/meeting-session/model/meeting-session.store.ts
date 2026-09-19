@@ -6,6 +6,7 @@ import type {
   RoomJoinResult,
   SystemEventDto,
 } from '@fedora-meetings/contracts-realtime';
+import type { PeerConnectionState } from '../../../entities/participant/model/peer-connection-state';
 
 export type MeetingConnectionState =
   | { status: 'idle' }
@@ -13,9 +14,10 @@ export type MeetingConnectionState =
   | { status: 'in-room'; roomId: string; participantId: string }
   | { status: 'room-full'; roomId: string }
   | { status: 'service-full' }
-  | { status: 'server-error' };
+  | { status: 'server-error' }
+  | { status: 'webrtc-unsupported' };
 
-export type PeerMediaState = 'connecting' | 'connected' | 'failed' | 'closed';
+export type PeerMediaState = PeerConnectionState;
 
 export type MeetingSessionState = {
   connection: MeetingConnectionState;
@@ -26,6 +28,7 @@ export type MeetingSessionState = {
   localStream: MediaStream | undefined;
   localMicrophoneEnabled: boolean;
   localCameraEnabled: boolean;
+  mediaPermissionDenied: boolean;
   remoteStreams: Record<string, MediaStream>;
   peerStates: Record<string, PeerMediaState>;
   remoteAudioBlocked: boolean;
@@ -40,6 +43,7 @@ const initialState: MeetingSessionState = {
   localStream: undefined,
   localMicrophoneEnabled: false,
   localCameraEnabled: false,
+  mediaPermissionDenied: false,
   remoteStreams: {},
   peerStates: {},
   remoteAudioBlocked: false,
@@ -148,6 +152,14 @@ export function setLocalMedia(input: {
   emit();
 }
 
+export function setMediaPermissionDenied(denied: boolean): void {
+  if (state.mediaPermissionDenied === denied) {
+    return;
+  }
+  state = { ...state, mediaPermissionDenied: denied };
+  emit();
+}
+
 export function setRemoteStream(
   participantId: string,
   stream: MediaStream,
@@ -193,6 +205,7 @@ export function clearMeetingMedia(): void {
     localStream: undefined,
     localMicrophoneEnabled: false,
     localCameraEnabled: false,
+    mediaPermissionDenied: false,
     remoteStreams: {},
     peerStates: {},
     remoteAudioBlocked: false,

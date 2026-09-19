@@ -31,6 +31,11 @@ export async function joinMeeting(
   }
 
   joinInFlightFor = roomId;
+  if (typeof RTCPeerConnection !== 'function') {
+    setMeetingConnection({ status: 'webrtc-unsupported' });
+    joinInFlightFor = undefined;
+    return;
+  }
   setMeetingConnection({ status: 'connecting', roomId });
 
   try {

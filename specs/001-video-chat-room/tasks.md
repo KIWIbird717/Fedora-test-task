@@ -284,8 +284,8 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 12
 
-- [ ] T101 [US12] Catch `NotAllowedError` in `libs/web/media/src/lib/local-media.ts`, join with media off, show Alert «Нет доступа к камере или микрофону. Вы в комнате, устройства выключены.» in `apps/web/src/features/meeting-session/ui/media-permission-alert.tsx`
-- [ ] T102 [US12] Ensure denied/absent camera uses silhouette + name and denied mic uses MicOff in `apps/web/src/entities/participant/ui/remote-tile.tsx`
+- [X] T101 [US12] Catch `NotAllowedError` in `libs/web/media/src/lib/local-media.ts`, join with media off, show Alert «Нет доступа к камере или микрофону. Вы в комнате, устройства выключены.» in `apps/web/src/features/meeting-session/ui/media-permission-alert.tsx`
+- [X] T102 [US12] Ensure denied/absent camera uses silhouette + name and denied mic uses MicOff in `apps/web/src/entities/participant/ui/remote-tile.tsx`
 
 **Checkpoint**: Denial is not an ejection
 
@@ -299,9 +299,9 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 11
 
-- [ ] T103 [US11] Confirm client `reconnection: false` and on unexpected socket close while InRoom run FR-035-safe teardown only when **server** is gone; peer drop uses leave path in `apps/web/src/features/meeting-session/model/socket-lifecycle.ts`
-- [ ] T104 [US11] On remote leave, `MeshCallSession.removePeer` in `apps/web/src/features/meeting-session/model/use-mesh-call.ts` so remaining links stay up
-- [ ] T105 [US11] Document two-tabs-two-slots in `apps/web/src/features/enter-room` (no merge of tabs); integration test disconnect frees slot in `apps/api/src/realtime/rooms.gateway.spec.ts`
+- [X] T103 [US11] Confirm client `reconnection: false` and on unexpected socket close while InRoom run FR-035-safe teardown only when **server** is gone; peer drop uses leave path in `apps/web/src/features/meeting-session/model/socket-lifecycle.ts`
+- [X] T104 [US11] On remote leave, `MeshCallSession.removePeer` in `apps/web/src/features/meeting-session/model/use-mesh-call.ts` so remaining links stay up
+- [X] T105 [US11] Document two-tabs-two-slots in `apps/web/src/features/enter-room` (no merge of tabs); integration test disconnect frees slot in `apps/api/src/realtime/rooms.gateway.spec.ts`
 
 **Checkpoint**: Partial failure is isolated
 
@@ -315,11 +315,11 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 13
 
-- [ ] T106 [US13] Feature-detect WebRTC before join; show «Ваш браузер не поддерживает WebRTC» in `apps/web/src/features/enter-room/ui/webrtc-unsupported.tsx`
-- [ ] T107 [US13] On connect failure show «Не удалось подключиться к серверу» on start in `apps/web/src/features/enter-room/ui/server-error.tsx`
-- [ ] T108 [US13] Mid-call server loss: same message, `dispose` mesh, `LocalMedia.stopAll`, navigate `/`, no reconnect in `apps/web/src/features/meeting-session/model/teardown-session.ts`
-- [ ] T109 [US13] Peer ICE failed/disconnected-timeout → tile silhouette + «Не удалось подключить медиа» without blocking chat/roster in `apps/web/src/entities/participant/ui/remote-tile.tsx` and `libs/web/webrtc/src/lib/peer-link.ts`
-- [ ] T110 [US13] Connecting-media tile must not look like FR-034 failed or infinite load (`connecting | connected | failed`) in `apps/web/src/entities/participant/model/peer-connection-state.ts`
+- [X] T106 [US13] Feature-detect WebRTC before join; show «Ваш браузер не поддерживает WebRTC» in `apps/web/src/features/enter-room/ui/webrtc-unsupported.tsx`
+- [X] T107 [US13] On connect failure show «Не удалось подключиться к серверу» on start in `apps/web/src/features/enter-room/ui/server-error.tsx`
+- [X] T108 [US13] Mid-call server loss: same message, `dispose` mesh, `LocalMedia.stopAll`, navigate `/`, no reconnect in `apps/web/src/features/meeting-session/model/teardown-session.ts`
+- [X] T109 [US13] Peer ICE failed/disconnected-timeout → tile silhouette + «Не удалось подключить медиа» without blocking chat/roster in `apps/web/src/entities/participant/ui/remote-tile.tsx` and `libs/web/webrtc/src/lib/peer-link.ts`
+- [X] T110 [US13] Connecting-media tile must not look like FR-034 failed or infinite load (`connecting | connected | failed`) in `apps/web/src/entities/participant/model/peer-connection-state.ts`
 
 **Checkpoint**: SC-010 failure matrix is specified in UI
 

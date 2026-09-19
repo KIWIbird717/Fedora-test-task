@@ -203,6 +203,25 @@ describe('MeshCallSession', () => {
     session.dispose();
   });
 
+  it('keeps remaining peer connections up when one peer is removed', () => {
+    const session = new MeshCallSession({
+      signaling: createFakeSignaling(),
+      iceServers: [],
+      onRemoteStream: vi.fn(),
+      onPeerState: vi.fn(),
+    });
+
+    session.addPeer('peer-1', 'answerer');
+    session.addPeer('peer-2', 'answerer');
+    const [first, second] = FakePeerConnection.instances;
+    session.removePeer('peer-1');
+
+    expect(session.peerCount).toBe(1);
+    expect(first?.close).toHaveBeenCalledTimes(1);
+    expect(second?.close).not.toHaveBeenCalled();
+    session.dispose();
+  });
+
   it('disposes every peer and ignores later signaling', () => {
     const signaling = createFakeSignaling();
     const session = new MeshCallSession({

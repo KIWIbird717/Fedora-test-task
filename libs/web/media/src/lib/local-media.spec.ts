@@ -81,6 +81,7 @@ describe('LocalMedia', () => {
 
     expect(snapshot.microphoneEnabled).toBe(false);
     expect(snapshot.cameraEnabled).toBe(false);
+    expect(snapshot.permissionDenied).toBe(false);
     media.release();
   });
 
@@ -184,6 +185,49 @@ describe('LocalMedia', () => {
     expect(lost.mock.calls[0]?.[0]).toBe('video');
     expect(lost.mock.calls[0]?.[1].cameraEnabled).toBe(false);
     expect(lost.mock.calls[0]?.[1].microphoneEnabled).toBe(true);
+    media.release();
+  });
+
+  it('joins with devices off and flags permission denial on NotAllowedError', async () => {
+    vi.stubGlobal('MediaStream', FakeMediaStream);
+    vi.stubGlobal('navigator', {
+      mediaDevices: {
+        getUserMedia: vi.fn(async () => {
+          const error = new Error('Permission denied');
+          error.name = 'NotAllowedError';
+          throw error;
+        }),
+      },
+    });
+
+    const media = new LocalMedia();
+    const snapshot = await media.acquire();
+
+    expect(snapshot.microphoneEnabled).toBe(false);
+    expect(snapshot.cameraEnabled).toBe(false);
+    expect(snapshot.permissionDenied).toBe(true);
+    expect(snapshot.stream.getTracks()).toHaveLength(0);
+    media.stopAll();
+  });
+
+  it('does not treat missing devices as permission denial', async () => {
+    vi.stubGlobal('MediaStream', FakeMediaStream);
+    vi.stubGlobal('navigator', {
+      mediaDevices: {
+        getUserMedia: vi.fn(async () => {
+          const error = new Error('Requested device not found');
+          error.name = 'NotFoundError';
+          throw error;
+        }),
+      },
+    });
+
+    const media = new LocalMedia();
+    const snapshot = await media.acquire();
+
+    expect(snapshot.microphoneEnabled).toBe(false);
+    expect(snapshot.cameraEnabled).toBe(false);
+    expect(snapshot.permissionDenied).toBe(false);
     media.release();
   });
 });

@@ -47,6 +47,7 @@ export type RoomClient = {
   onOffer(handler: (payload: SignalOfferPush) => void): () => void;
   onAnswer(handler: (payload: SignalAnswerPush) => void): () => void;
   onIceCandidate(handler: (payload: SignalIcePush) => void): () => void;
+  onDisconnect(handler: (reason: string) => void): () => void;
 };
 
 export function createRoomClient(socket: Socket): RoomClient {
@@ -87,6 +88,15 @@ export function createRoomClient(socket: Socket): RoomClient {
     onAnswer: (handler) => listen(socket, realtimeEvents.signalAnswer, handler),
     onIceCandidate: (handler) =>
       listen(socket, realtimeEvents.signalIceCandidate, handler),
+    onDisconnect: (handler) => {
+      const listener = (reason: string) => {
+        handler(reason);
+      };
+      socket.on('disconnect', listener);
+      return () => {
+        socket.off('disconnect', listener);
+      };
+    },
   };
 }
 

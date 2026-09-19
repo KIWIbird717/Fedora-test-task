@@ -5,14 +5,27 @@ import {
   setActiveMeshSession,
 } from './active-mesh-session';
 import { releaseMeetingRealtime } from './join-meeting';
-import { resetMeetingSession } from './meeting-session.store';
+import {
+  resetMeetingSession,
+  setMeetingConnection,
+} from './meeting-session.store';
 
-export function teardownSession(): void {
+function releaseRealtimeAndMedia(): void {
   releaseMeetingRealtime();
   getActiveMeshSession()?.dispose();
   setActiveMeshSession(undefined);
-  localMedia.release();
+  localMedia.stopAll();
+}
+
+export function teardownSession(): void {
+  releaseRealtimeAndMedia();
   resetMeetingSession();
+}
+
+export function teardownSessionAfterServerLoss(): void {
+  releaseRealtimeAndMedia();
+  resetMeetingSession();
+  setMeetingConnection({ status: 'server-error' });
 }
 
 export function useSessionTeardown(): void {

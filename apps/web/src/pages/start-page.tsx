@@ -14,8 +14,11 @@ import { ServiceAtCapacityError, useMintRoomMutation } from '../features/enter-r
 import { enterCreatedRoom } from '../features/enter-room/model/enter-room';
 import { validateDisplayName } from '../features/enter-room/model/display-name-rules';
 import { useDisplayName } from '../features/enter-room/model/display-name.store';
+import { isWebRtcSupported } from '../features/enter-room/model/webrtc-support';
 import { ConnectingIndicator } from '../features/enter-room/ui/connecting-indicator';
 import { DisplayNameField } from '../features/enter-room/ui/display-name-field';
+import { ServerError } from '../features/enter-room/ui/server-error';
+import { WebrtcUnsupported } from '../features/enter-room/ui/webrtc-unsupported';
 import { captureEntryGesture } from '../features/meeting-session/model/autoplay';
 import {
   setMeetingConnection,
@@ -28,12 +31,13 @@ export function StartPage() {
   const navigate = useNavigate();
   const mintRoom = useMintRoomMutation();
   const validation = validateDisplayName(displayName);
+  const webrtcSupported = isWebRtcSupported();
   const isConnecting =
     mintRoom.isPending || session.connection.status === 'connecting';
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
-    if (!validation.ok || isConnecting) {
+    if (!validation.ok || isConnecting || !webrtcSupported) {
       return;
     }
     captureEntryGesture();
@@ -62,7 +66,9 @@ export function StartPage() {
           <CardTitle>Fedora Meetings</CardTitle>
         </CardHeader>
         <CardContent>
-          {isConnecting ? (
+          {!webrtcSupported || session.connection.status === 'webrtc-unsupported' ? (
+            <WebrtcUnsupported />
+          ) : isConnecting ? (
             <ConnectingIndicator />
           ) : (
             <form className="flex flex-col gap-4" onSubmit={onSubmit}>
@@ -74,11 +80,7 @@ export function StartPage() {
                 </Alert>
               ) : null}
               {session.connection.status === 'server-error' ? (
-                <Alert variant="destructive">
-                  <AlertDescription>
-                    {russianMessages.SERVER_UNREACHABLE}
-                  </AlertDescription>
-                </Alert>
+                <ServerError />
               ) : null}
               <DisplayNameField />
               <Button type="submit" disabled={!validation.ok}>
