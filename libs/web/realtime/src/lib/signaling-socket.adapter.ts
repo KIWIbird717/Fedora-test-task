@@ -6,13 +6,22 @@ export function createSignalingSocketAdapter(
 ): SignalingPort {
   return {
     sendOffer: async (input) => {
-      await roomClient.sendOffer(input);
+      const ack = await roomClient.sendOffer(input);
+      if (!ack.ok) {
+        throw new Error(ack.error.message);
+      }
     },
     sendAnswer: async (input) => {
-      await roomClient.sendAnswer(input);
+      const ack = await roomClient.sendAnswer(input);
+      if (!ack.ok) {
+        throw new Error(ack.error.message);
+      }
     },
     sendIceCandidate: async (input) => {
-      await roomClient.sendIceCandidate(input);
+      const ack = await roomClient.sendIceCandidate(input);
+      if (!ack.ok) {
+        throw new Error(ack.error.message);
+      }
     },
     onOffer: (handler) => roomClient.onOffer(handler),
     onAnswer: (handler) => roomClient.onAnswer(handler),

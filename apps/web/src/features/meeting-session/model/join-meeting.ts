@@ -1,6 +1,8 @@
 import { russianMessages } from '@fedora-meetings/contracts-realtime';
 import { createRoomClient, createSocket } from '@fedora-meetings/web-realtime';
 import type { RoomClient } from '@fedora-meetings/web-realtime';
+import { bindChatMessages } from '../../send-chat/model/send-chat';
+import { setActiveRoomClient } from './active-room-client';
 import {
   addMeetingParticipant,
   applyJoinAck,
@@ -11,7 +13,7 @@ import {
 
 let socket: ReturnType<typeof createSocket> | undefined;
 let roomClient: RoomClient | undefined;
-let unwatchRoster: (() => void) | undefined;
+let unwatchSession: (() => void) | undefined;
 let joinInFlightFor: string | undefined;
 
 export async function joinMeeting(
@@ -47,7 +49,7 @@ export async function joinMeeting(
     }
 
     applyJoinAck(ack.data);
-    bindRoster(client);
+    bindSessionEvents(client);
   } catch {
     setMeetingConnection({ status: 'server-error' });
   } finally {
@@ -61,6 +63,7 @@ function ensureRoomClient(): RoomClient {
   if (!socket || !roomClient) {
     socket = createSocket();
     roomClient = createRoomClient(socket);
+    setActiveRoomClient(roomClient);
   }
   return roomClient;
 }
@@ -88,12 +91,17 @@ function connectSocket(): Promise<void> {
   });
 }
 
-function bindRoster(client: RoomClient): void {
-  unwatchRoster?.();
-  unwatchRoster = client.watchRoster({
+function bindSessionEvents(client: RoomClient): void {
+  unwatchSession?.();
+  const unwatchRoster = client.watchRoster({
     onParticipantJoined: addMeetingParticipant,
     onParticipantLeft: (payload) => {
       removeMeetingParticipant(payload.participantId);
     },
   });
+  const unwatchChat = bindChatMessages(client);
+  unwatchSession = () => {
+    unwatchRoster();
+    unwatchChat();
+  };
 }

@@ -165,12 +165,12 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 8
 
-- [ ] T073 [US8] Chat panel (ScrollArea, list, Textarea, send) in `apps/web/src/widgets/chat-panel/ui/chat-panel.tsx` as a secondary column at ≥1024px
-- [ ] T074 [US8] `chat:send` + `chat:message` handling in `apps/web/src/features/send-chat/model/send-chat.ts`; render `text` as text nodes only in `apps/web/src/entities/chat-message/ui/chat-message.tsx`
-- [ ] T075 [US8] Format `sentAt` as 24-hour `HH:MM` in the viewer locale clock in `apps/web/src/entities/chat-message/lib/format-time.ts`
-- [ ] T076 [US8] Block empty/whitespace send; show «Сообщение не длиннее 1000 символов» and «Слишком много сообщений. Подождите немного.» from acks in `apps/web/src/features/send-chat/ui/chat-composer.tsx`
-- [ ] T077 [US8] Auto-scroll on new message in `apps/web/src/widgets/chat-panel/ui/chat-panel.tsx`; seed history from join ack only (no replayed system events)
-- [ ] T078 [US8] Integration test chat broadcast, trim/empty reject, 1000-cap, rate limit in `apps/api/src/realtime/chat.gateway.spec.ts`
+- [X] T073 [US8] Chat panel (ScrollArea, list, Textarea, send) in `apps/web/src/widgets/chat-panel/ui/chat-panel.tsx` as a secondary column at ≥1024px
+- [X] T074 [US8] `chat:send` + `chat:message` handling in `apps/web/src/features/send-chat/model/send-chat.ts`; render `text` as text nodes only in `apps/web/src/entities/chat-message/ui/chat-message.tsx`
+- [X] T075 [US8] Format `sentAt` as 24-hour `HH:MM` in the viewer locale clock in `apps/web/src/entities/chat-message/lib/format-time.ts`
+- [X] T076 [US8] Block empty/whitespace send; show «Сообщение не длиннее 1000 символов» and «Слишком много сообщений. Подождите немного.» from acks in `apps/web/src/features/send-chat/ui/chat-composer.tsx`
+- [X] T077 [US8] Auto-scroll on new message in `apps/web/src/widgets/chat-panel/ui/chat-panel.tsx`; seed history from join ack only (no replayed system events)
+- [X] T078 [US8] Integration test chat broadcast, trim/empty reject, 1000-cap, rate limit in `apps/api/src/realtime/chat.gateway.spec.ts`
 
 **Checkpoint**: Chat works without video
 
@@ -184,14 +184,14 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 6
 
-- [ ] T079 [US6] Implement `LocalMedia` acquire/release in `libs/web/media/src/lib/local-media.ts` (`getUserMedia`; default mic+camera on; absent devices → off, still join)
-- [ ] T080 [US6] Implement `PeerLink` (`RTCPeerConnection`, STUN from join `iceServers`, no TURN) in `libs/web/webrtc/src/lib/peer-link.ts`
-- [ ] T081 [US6] Implement `MeshCallSession` in `libs/web/webrtc/src/lib/mesh-call-session.ts`: existing peers offer to newcomer; max 3 PCs; `addPeer`/`removePeer`/`dispose`; React must not import this file’s internals
-- [ ] T082 [US6] Wire session in `apps/web/src/features/meeting-session/model/use-mesh-call.ts` (hook only; no `RTCPeerConnection` in JSX)
-- [ ] T083 [US6] Remote adaptive grid (1/2/3 remotes; 4th person is self PIP) + name overlay in `apps/web/src/widgets/video-grid/ui/video-grid.tsx` and `apps/web/src/entities/participant/ui/remote-tile.tsx`
-- [ ] T084 [US6] Self-view PIP in `apps/web/src/entities/participant/ui/self-view.tsx`; camera-off uses silhouette + name (FR-018)
-- [ ] T085 [US6] Treat entry click as autoplay gesture; if remote audio still blocked show «Включить звук» in `apps/web/src/features/meeting-session/ui/enable-sound-button.tsx`
-- [ ] T086 [US6] Unit-test mesh add/remove/dispose with mocked `RTCPeerConnection` in `libs/web/webrtc/src/lib/mesh-call-session.spec.ts`
+- [X] T079 [US6] Implement `LocalMedia` acquire/release in `libs/web/media/src/lib/local-media.ts` (`getUserMedia`; default mic+camera on; absent devices → off, still join)
+- [X] T080 [US6] Implement `PeerLink` (`RTCPeerConnection`, STUN from join `iceServers`, no TURN) in `libs/web/webrtc/src/lib/peer-link.ts`
+- [X] T081 [US6] Implement `MeshCallSession` in `libs/web/webrtc/src/lib/mesh-call-session.ts`: existing peers offer to newcomer; max 3 PCs; `addPeer`/`removePeer`/`dispose`; React must not import this file’s internals
+- [X] T082 [US6] Wire session in `apps/web/src/features/meeting-session/model/use-mesh-call.ts` (hook only; no `RTCPeerConnection` in JSX)
+- [X] T083 [US6] Remote adaptive grid (1/2/3 remotes; 4th person is self PIP) + name overlay in `apps/web/src/widgets/video-grid/ui/video-grid.tsx` and `apps/web/src/entities/participant/ui/remote-tile.tsx`
+- [X] T084 [US6] Self-view PIP in `apps/web/src/entities/participant/ui/self-view.tsx`; camera-off uses silhouette + name (FR-018)
+- [X] T085 [US6] Treat entry click as autoplay gesture; if remote audio still blocked show «Включить звук» in `apps/web/src/features/meeting-session/ui/enable-sound-button.tsx`
+- [X] T086 [US6] Unit-test mesh add/remove/dispose with mocked `RTCPeerConnection` in `libs/web/webrtc/src/lib/mesh-call-session.spec.ts`
 
 **Checkpoint**: Multi-party call is demonstrable on localhost
 

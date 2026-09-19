@@ -14,11 +14,19 @@ export type MeetingConnectionState =
   | { status: 'service-full' }
   | { status: 'server-error' };
 
+export type PeerMediaState = 'connecting' | 'connected' | 'failed' | 'closed';
+
 export type MeetingSessionState = {
   connection: MeetingConnectionState;
   participants: ParticipantDto[];
   messages: ChatMessageDto[];
   iceServers: IceServerDto[];
+  localStream: MediaStream | undefined;
+  localMicrophoneEnabled: boolean;
+  localCameraEnabled: boolean;
+  remoteStreams: Record<string, MediaStream>;
+  peerStates: Record<string, PeerMediaState>;
+  remoteAudioBlocked: boolean;
 };
 
 const initialState: MeetingSessionState = {
@@ -26,6 +34,12 @@ const initialState: MeetingSessionState = {
   participants: [],
   messages: [],
   iceServers: [],
+  localStream: undefined,
+  localMicrophoneEnabled: false,
+  localCameraEnabled: false,
+  remoteStreams: {},
+  peerStates: {},
+  remoteAudioBlocked: false,
 };
 
 let state: MeetingSessionState = initialState;
@@ -75,6 +89,7 @@ export function setMeetingIceServers(iceServers: IceServerDto[]): void {
 
 export function applyJoinAck(result: RoomJoinResult): void {
   state = {
+    ...initialState,
     connection: {
       status: 'in-room',
       roomId: result.roomId,
@@ -83,6 +98,83 @@ export function applyJoinAck(result: RoomJoinResult): void {
     participants: result.participants,
     messages: result.messages,
     iceServers: result.iceServers,
+  };
+  emit();
+}
+
+export function appendMeetingMessage(message: ChatMessageDto): void {
+  if (state.messages.some((existing) => existing.id === message.id)) {
+    return;
+  }
+  state = {
+    ...state,
+    messages: [...state.messages, message],
+  };
+  emit();
+}
+
+export function setLocalMedia(input: {
+  stream: MediaStream | undefined;
+  microphoneEnabled: boolean;
+  cameraEnabled: boolean;
+}): void {
+  state = {
+    ...state,
+    localStream: input.stream,
+    localMicrophoneEnabled: input.microphoneEnabled,
+    localCameraEnabled: input.cameraEnabled,
+  };
+  emit();
+}
+
+export function setRemoteStream(
+  participantId: string,
+  stream: MediaStream,
+): void {
+  state = {
+    ...state,
+    remoteStreams: { ...state.remoteStreams, [participantId]: stream },
+  };
+  emit();
+}
+
+export function setPeerMediaState(
+  participantId: string,
+  peerState: PeerMediaState,
+): void {
+  state = {
+    ...state,
+    peerStates: { ...state.peerStates, [participantId]: peerState },
+  };
+  emit();
+}
+
+export function removePeerMedia(participantId: string): void {
+  const remoteStreams = { ...state.remoteStreams };
+  const peerStates = { ...state.peerStates };
+  delete remoteStreams[participantId];
+  delete peerStates[participantId];
+  state = { ...state, remoteStreams, peerStates };
+  emit();
+}
+
+export function setRemoteAudioBlocked(blocked: boolean): void {
+  if (state.remoteAudioBlocked === blocked) {
+    return;
+  }
+  state = { ...state, remoteAudioBlocked: blocked };
+  emit();
+}
+
+export function clearMeetingMedia(): void {
+  state = {
+    ...state,
+    localStream: undefined,
+    localMicrophoneEnabled: false,
+    localCameraEnabled: false,
+    remoteStreams: {},
+    peerStates: {},
+    remoteAudioBlocked: false,
   };
   emit();
 }

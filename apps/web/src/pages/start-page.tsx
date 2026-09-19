@@ -16,6 +16,7 @@ import { validateDisplayName } from '../features/enter-room/model/display-name-r
 import { useDisplayName } from '../features/enter-room/model/display-name.store';
 import { ConnectingIndicator } from '../features/enter-room/ui/connecting-indicator';
 import { DisplayNameField } from '../features/enter-room/ui/display-name-field';
+import { captureEntryGesture } from '../features/meeting-session/model/autoplay';
 import {
   setMeetingConnection,
   useMeetingSession,
@@ -35,6 +36,7 @@ export function StartPage() {
     if (!validation.ok || isConnecting) {
       return;
     }
+    captureEntryGesture();
     setMeetingConnection({ status: 'connecting', roomId: '' });
     try {
       const roomId = await mintRoom.mutateAsync();
