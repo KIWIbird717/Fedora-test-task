@@ -20,5 +20,7 @@
       "type:application"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@fedora-meetings/api-domain": "workspace:*"
+  }
 }

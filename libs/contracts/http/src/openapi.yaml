@@ -1,0 +1,94 @@
+openapi: 3.1.0
+info:
+  title: Fedora Meetings HTTP API
+  version: 1.0.0
+  description: |
+    HTTP surface for the video chat room. Real-time join, chat, media state and
+    WebRTC signaling are Socket.IO — see `realtime.md`. Creating a room id does
+    not insert an in-memory room; the room is created on the first successful
+    `room:join`.
+servers:
+  - url: /api
+    description: Same-origin via the web reverse proxy (Docker) or Vite proxy (dev)
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Liveness probe
+      tags: [Health]
+      responses:
+        "200":
+          description: Process is up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /rooms:
+    post:
+      operationId: mintRoomId
+      summary: Mint a unique unused room identifier
+      description: |
+        Does not create a room aggregate. Returns 503 when `activeRoomCount`
+        is already at `ROOM_CEILING` (best-effort UX). Join remains the
+        authoritative create/ceiling check.
+      tags: [Rooms]
+      responses:
+        "201":
+          description: Identifier minted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MintRoomResponse"
+        "503":
+          description: Server-wide room ceiling reached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                atCapacity:
+                  value:
+                    code: SERVICE_AT_CAPACITY
+                    message: Сервис переполнен. Попробуйте позже.
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+    MintRoomResponse:
+      type: object
+      additionalProperties: false
+      required: [roomId]
+      properties:
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+    RoomId:
+      type: string
+      minLength: 8
+      maxLength: 32
+      pattern: "^[A-Za-z0-9_-]+$"
+      description: Opaque URL-safe room identifier (minted as 12 characters)
+    ErrorCode:
+      type: string
+      enum:
+        - SERVICE_AT_CAPACITY
+        - VALIDATION_ERROR
+        - INTERNAL_ERROR
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+        message:
+          type: string
+          description: User-facing Russian message; no stack traces
+tags:
+  - name: Health
+  - name: Rooms

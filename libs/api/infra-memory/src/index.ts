@@ -1,1 +1,1 @@
-export * from './lib/api-infra-memory.js';
+export { InMemoryRoomRegistry } from './lib/in-memory-room-registry.js';

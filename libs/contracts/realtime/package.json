@@ -20,5 +20,7 @@
       "type:contracts"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "zod": "^3.24.2"
+  }
 }

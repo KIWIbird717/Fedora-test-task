@@ -1,12 +1,15 @@
-// Uncomment this line to use CSS modules
-// import styles from './app.module.css';
-import NxWelcome from './nx-welcome';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider } from '@tanstack/react-router';
+import { TooltipProvider } from '@fedora-meetings/web-ui';
+import { queryClient, router } from './router';
 
 export function App() {
   return (
-    <div>
-      <NxWelcome title="web" />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <RouterProvider router={router} />
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 

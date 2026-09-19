@@ -15,6 +15,15 @@
     "@fedora-meetings/web-media": "workspace:*",
     "@fedora-meetings/web-realtime": "workspace:*",
     "@fedora-meetings/web-ui": "workspace:*",
-    "@fedora-meetings/web-webrtc": "workspace:*"
+    "@fedora-meetings/web-webrtc": "workspace:*",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@tanstack/react-query": "^5.90.2",
+    "@tanstack/react-router": "^1.132.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "tailwindcss": "^4.1.13"
   }
 }

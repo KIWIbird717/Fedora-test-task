@@ -4,6 +4,7 @@ node_modules/
 # Build
 dist/
 build/
+out-tsc/
 coverage/
 .nx/cache/
 .nx/workspace-data/

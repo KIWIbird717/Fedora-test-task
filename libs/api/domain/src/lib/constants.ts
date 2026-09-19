@@ -1,0 +1,10 @@
+export const DISPLAY_NAME_MAX_LENGTH = 30;
+export const DISPLAY_NAME_PATTERN = /^[\p{L}\p{N} \-']+$/u;
+export const CHAT_TEXT_MAX_LENGTH = 1000;
+export const CHAT_RATE_MAX_MESSAGES = 10;
+export const CHAT_RATE_WINDOW_MS = 10_000;
+export const ROOM_MAX_PARTICIPANTS = 4;
+export const ROOM_ID_PATTERN = /^[A-Za-z0-9_-]{8,32}$/;
+export const ROOM_ID_MIN_LENGTH = 8;
+export const ROOM_ID_MAX_LENGTH = 32;
+export const MINTED_ROOM_ID_LENGTH = 12;

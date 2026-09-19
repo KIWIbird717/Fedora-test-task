@@ -8,3 +8,4 @@ allowBuilds:
   unrs-resolver: true
   '@nestjs/core': false
   '@swc/core': false
+  '@scarf/scarf': false

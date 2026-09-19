@@ -6,10 +6,13 @@ export default [
   ...nx.configs['flat/javascript'],
   {
     ignores: [
+      '**/node_modules',
       '**/dist',
+      '**/build',
       '**/out-tsc',
       '**/coverage',
       '**/.nx',
+      '**/*.min.js',
       '**/vite.config.*.timestamp*',
       '**/vitest.config.*.timestamp*',
       '**/test-output',

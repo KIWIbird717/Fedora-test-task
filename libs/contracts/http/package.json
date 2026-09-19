@@ -18,7 +18,21 @@
     "tags": [
       "scope:shared",
       "type:contracts"
-    ]
+    ],
+    "targets": {
+      "generate": {
+        "executor": "nx:run-commands",
+        "cache": true,
+        "inputs": ["{projectRoot}/src/openapi.yaml"],
+        "outputs": ["{workspaceRoot}/apps/web/src/shared/api/schema.d.ts"],
+        "options": {
+          "command": "pnpm exec openapi-typescript src/openapi.yaml -o ../../../apps/web/src/shared/api/schema.d.ts",
+          "cwd": "{projectRoot}"
+        }
+      }
+    }
   },
-  "dependencies": {}
+  "devDependencies": {
+    "openapi-typescript": "^7.9.1"
+  }
 }

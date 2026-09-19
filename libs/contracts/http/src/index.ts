@@ -1,1 +1,1 @@
-export * from './lib/contracts-http.js';
+export const openApiDocumentFileName = 'openapi.yaml';

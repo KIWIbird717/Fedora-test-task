@@ -59,45 +59,45 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T019 Copy `specs/001-video-chat-room/contracts/openapi.yaml` into `libs/contracts/http/src/openapi.yaml` and add Nx target `contracts-http:generate` writing `apps/web/src/shared/api/schema.d.ts` via openapi-typescript
-- [ ] T020 Implement Socket.IO event names, DTO types, `Ack<T>`, `ErrorCode` union, and Zod payloads in `libs/contracts/realtime/src/lib/` matching `specs/001-video-chat-room/contracts/realtime.md` (export only from `libs/contracts/realtime/src/index.ts`)
-- [ ] T021 [P] Add domain constants in `libs/api/domain/src/lib/constants.ts`: display-name max 30, pattern `^[\p{L}\p{N} \-']+$`, chat max 1000, chat rate 10 per 10 seconds, room max 4 participants, room id pattern `^[A-Za-z0-9_-]{8,32}$`
-- [ ] T022 [P] Implement branded `RoomId` in `libs/api/domain/src/lib/room-id.ts` (8–32 chars `A-Za-z0-9_-`) and `ParticipantId` UUID in `libs/api/domain/src/lib/participant-id.ts`
-- [ ] T023 [P] Implement `DisplayName` value object in `libs/api/domain/src/lib/display-name.ts`: trimmed; length 1–30; pattern `^[\p{L}\p{N} \-']+$`; reject empty/whitespace; no uniqueness
-- [ ] T024 [P] Implement `ChatText` in `libs/api/domain/src/lib/chat-text.ts`: trimmed; reject empty/whitespace; max 1000 characters
-- [ ] T025 [P] Implement `MediaState` in `libs/api/domain/src/lib/media-state.ts` with `microphoneEnabled: boolean` and `cameraEnabled: boolean`
-- [ ] T026 [P] Implement named domain errors in `libs/api/domain/src/lib/errors.ts` (`RoomFullError`, `ServiceAtCapacityError`, `InvalidDisplayNameError`, `InvalidChatTextError`)
-- [ ] T027 Implement `Participant` entity in `libs/api/domain/src/lib/participant.ts` (UUID id, DisplayName, MediaState, joinedAt, `recentChatSentAt: Date[]` capped at 10)
-- [ ] T028 Implement `ChatMessage` in `libs/api/domain/src/lib/chat-message.ts` (id UUID, authorId, authorName snapshot, ChatText, sentAt UTC)
-- [ ] T029 Implement `Room` aggregate in `libs/api/domain/src/lib/room.ts`: `participants.length` in 1..4 while stored; duplicate DisplayNames allowed; distinct ParticipantIds; **do not persist system events**; `addParticipant` / `removeParticipant` / `appendMessage`
-- [ ] T030 Write failing then passing Vitest tests for DisplayName, ChatText, 4-cap, last-participant removal, and duplicate names in `libs/api/domain/src/lib/*.spec.ts`
-- [ ] T031 Declare `RoomRegistry` port in `libs/api/application/src/lib/ports/room-registry.port.ts` (`mintRoomId`, `tryJoin` without await between check and mutate, `leave`, `get`, `activeRoomCount`)
-- [ ] T032 Declare `RoomEventPublisher` port in `libs/api/application/src/lib/ports/room-event-publisher.port.ts` for participant/chat/media/signal broadcasts (no Socket.IO types)
-- [ ] T033 Implement `MintRoomId` in `libs/api/application/src/lib/mint-room-id.use-case.ts` (nanoid 12; retry if active; optional ceiling pre-check; **must not insert an empty room**)
-- [ ] T034 Implement `JoinRoom` in `libs/api/application/src/lib/join-room.use-case.ts` (create if absent with ROOM_CEILING; join if present with 4-cap; return iceServers from config; authored chat history only)
-- [ ] T035 Implement `LeaveRoom` in `libs/api/application/src/lib/leave-room.use-case.ts` (delete aggregate when last participant leaves)
-- [ ] T036 Implement `SendChatMessage` in `libs/api/application/src/lib/send-chat-message.use-case.ts` (ChatText rules; 10 messages / 10 seconds via `recentChatSentAt`)
-- [ ] T037 [P] Implement `UpdateMediaState` in `libs/api/application/src/lib/update-media-state.use-case.ts`
-- [ ] T038 [P] Implement `RelaySignal` in `libs/api/application/src/lib/relay-signal.use-case.ts` (membership check only; do not parse SDP)
-- [ ] T039 Implement `InMemoryRoomRegistry` in `libs/api/infra-memory/src/lib/in-memory-room-registry.ts` with synchronous `tryJoin`/`leave` critical sections and `activeRoomCount() <= ROOM_CEILING`
-- [ ] T040 Write failing then passing Vitest tests for atomic last-slot join and ceiling-on-create in `libs/api/application/src/lib/join-room.use-case.spec.ts` using a fake registry
-- [ ] T041 Validate env with Zod at startup in `apps/api/src/config/env.ts`: `API_HOST`, `API_PORT` default 3000, `ROOM_CEILING` default 50 integer ≥ 1, `STUN_URLS`, `CORS_ORIGINS`, `LOG_LEVEL`; never read `process.env` from domain/application
-- [ ] T042 Implement HTTP exception filter mapping domain/application errors to `{ code, message }` (Russian `message`, no stacks) in `apps/api/src/http/http-exception.filter.ts`
-- [ ] T043 Implement `GET /api/health` in `apps/api/src/http/health.controller.ts` returning `{ status: "ok" }`
-- [ ] T044 Implement `POST /api/rooms` in `apps/api/src/http/rooms.controller.ts` per OpenAPI (`201 { roomId }` / `503 SERVICE_AT_CAPACITY` with «Сервис переполнен. Попробуйте позже.»)
-- [ ] T045 Serve OpenAPI + Scalar at `/api/docs` from `apps/api/src/main.ts` (Express adapter; global prefix `api`)
-- [ ] T046 Implement `socketId → participantId` map (never expose socket.id) in `apps/api/src/realtime/socket-participant.map.ts`
-- [ ] T047 Implement `RoomsGateway` in `apps/api/src/realtime/rooms.gateway.ts`: Zod on inbound events; acks from `libs/contracts/realtime`; `disconnect` → `LeaveRoom`; Socket.IO room `room:{roomId}`; unicast signaling; no domain logic in the gateway
-- [ ] T048 Wire `AppModule` in `apps/api/src/app.module.ts` (use cases, in-memory registry, HTTP, gateway) and CORS from `CORS_ORIGINS`
-- [ ] T049 Add Vite proxy in `apps/web/vite.config.ts` for `/api` and `/socket.io` to the API; disable client reconnection in `libs/web/realtime/src/lib/socket-client.ts` (`reconnection: false`)
-- [ ] T050 Implement room command client (join/leave/chat/media/signal + typed acks) in `libs/web/realtime/src/lib/room-client.ts`
-- [ ] T051 Implement `SignalingPort` interface in `libs/web/webrtc/src/lib/signaling.port.ts` and Socket.IO adapter in `libs/web/realtime/src/lib/signaling-socket.adapter.ts` (web-webrtc must not import socket.io)
-- [ ] T052 Add light-theme semantic CSS variables (`background`, `foreground`, `card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`) plus Inter via fontsource in `apps/web/src/app/styles.css` and `libs/web/ui` tokens; structure `.dark` slots but do not ship a dark theme
-- [ ] T053 Add shadcn primitives (Button, Input, Textarea, Card, Tooltip, Avatar, Badge, Separator, ScrollArea, Alert) plus `cn` (clsx + tailwind-merge) in `libs/web/ui/src/`; Lucide only; no second icon pack
-- [ ] T054 Implement TanStack Router in `apps/web/src/app/router.tsx` with `/` and `/room/$roomId`; QueryClient for HTTP only; no localStorage
-- [ ] T055 Implement meeting-session store (`useSyncExternalStore`) in `apps/web/src/features/meeting-session/model/meeting-session.store.ts` with connection-state union; do not put realtime into TanStack Query
-- [ ] T056 Create empty FSD public APIs: `apps/web/src/pages/start-page.tsx`, `apps/web/src/pages/room-page.tsx`, `apps/web/src/widgets/control-bar/`, `apps/web/src/widgets/video-grid/`, `apps/web/src/widgets/chat-panel/`, `apps/web/src/widgets/participant-list/`
-- [ ] T057 Document every env var (no secrets) in `.env.example`
+- [X] T019 Copy `specs/001-video-chat-room/contracts/openapi.yaml` into `libs/contracts/http/src/openapi.yaml` and add Nx target `contracts-http:generate` writing `apps/web/src/shared/api/schema.d.ts` via openapi-typescript
+- [X] T020 Implement Socket.IO event names, DTO types, `Ack<T>`, `ErrorCode` union, and Zod payloads in `libs/contracts/realtime/src/lib/` matching `specs/001-video-chat-room/contracts/realtime.md` (export only from `libs/contracts/realtime/src/index.ts`)
+- [X] T021 [P] Add domain constants in `libs/api/domain/src/lib/constants.ts`: display-name max 30, pattern `^[\p{L}\p{N} \-']+$`, chat max 1000, chat rate 10 per 10 seconds, room max 4 participants, room id pattern `^[A-Za-z0-9_-]{8,32}$`
+- [X] T022 [P] Implement branded `RoomId` in `libs/api/domain/src/lib/room-id.ts` (8–32 chars `A-Za-z0-9_-`) and `ParticipantId` UUID in `libs/api/domain/src/lib/participant-id.ts`
+- [X] T023 [P] Implement `DisplayName` value object in `libs/api/domain/src/lib/display-name.ts`: trimmed; length 1–30; pattern `^[\p{L}\p{N} \-']+$`; reject empty/whitespace; no uniqueness
+- [X] T024 [P] Implement `ChatText` in `libs/api/domain/src/lib/chat-text.ts`: trimmed; reject empty/whitespace; max 1000 characters
+- [X] T025 [P] Implement `MediaState` in `libs/api/domain/src/lib/media-state.ts` with `microphoneEnabled: boolean` and `cameraEnabled: boolean`
+- [X] T026 [P] Implement named domain errors in `libs/api/domain/src/lib/errors.ts` (`RoomFullError`, `ServiceAtCapacityError`, `InvalidDisplayNameError`, `InvalidChatTextError`)
+- [X] T027 Implement `Participant` entity in `libs/api/domain/src/lib/participant.ts` (UUID id, DisplayName, MediaState, joinedAt, `recentChatSentAt: Date[]` capped at 10)
+- [X] T028 Implement `ChatMessage` in `libs/api/domain/src/lib/chat-message.ts` (id UUID, authorId, authorName snapshot, ChatText, sentAt UTC)
+- [X] T029 Implement `Room` aggregate in `libs/api/domain/src/lib/room.ts`: `participants.length` in 1..4 while stored; duplicate DisplayNames allowed; distinct ParticipantIds; **do not persist system events**; `addParticipant` / `removeParticipant` / `appendMessage`
+- [X] T030 Write failing then passing Vitest tests for DisplayName, ChatText, 4-cap, last-participant removal, and duplicate names in `libs/api/domain/src/lib/*.spec.ts`
+- [X] T031 Declare `RoomRegistry` port in `libs/api/application/src/lib/ports/room-registry.port.ts` (`mintRoomId`, `tryJoin` without await between check and mutate, `leave`, `get`, `activeRoomCount`)
+- [X] T032 Declare `RoomEventPublisher` port in `libs/api/application/src/lib/ports/room-event-publisher.port.ts` for participant/chat/media/signal broadcasts (no Socket.IO types)
+- [X] T033 Implement `MintRoomId` in `libs/api/application/src/lib/mint-room-id.use-case.ts` (nanoid 12; retry if active; optional ceiling pre-check; **must not insert an empty room**)
+- [X] T034 Implement `JoinRoom` in `libs/api/application/src/lib/join-room.use-case.ts` (create if absent with ROOM_CEILING; join if present with 4-cap; return iceServers from config; authored chat history only)
+- [X] T035 Implement `LeaveRoom` in `libs/api/application/src/lib/leave-room.use-case.ts` (delete aggregate when last participant leaves)
+- [X] T036 Implement `SendChatMessage` in `libs/api/application/src/lib/send-chat-message.use-case.ts` (ChatText rules; 10 messages / 10 seconds via `recentChatSentAt`)
+- [X] T037 [P] Implement `UpdateMediaState` in `libs/api/application/src/lib/update-media-state.use-case.ts`
+- [X] T038 [P] Implement `RelaySignal` in `libs/api/application/src/lib/relay-signal.use-case.ts` (membership check only; do not parse SDP)
+- [X] T039 Implement `InMemoryRoomRegistry` in `libs/api/infra-memory/src/lib/in-memory-room-registry.ts` with synchronous `tryJoin`/`leave` critical sections and `activeRoomCount() <= ROOM_CEILING`
+- [X] T040 Write failing then passing Vitest tests for atomic last-slot join and ceiling-on-create in `libs/api/application/src/lib/join-room.use-case.spec.ts` using a fake registry
+- [X] T041 Validate env with Zod at startup in `apps/api/src/config/env.ts`: `API_HOST`, `API_PORT` default 3000, `ROOM_CEILING` default 50 integer ≥ 1, `STUN_URLS`, `CORS_ORIGINS`, `LOG_LEVEL`; never read `process.env` from domain/application
+- [X] T042 Implement HTTP exception filter mapping domain/application errors to `{ code, message }` (Russian `message`, no stacks) in `apps/api/src/http/http-exception.filter.ts`
+- [X] T043 Implement `GET /api/health` in `apps/api/src/http/health.controller.ts` returning `{ status: "ok" }`
+- [X] T044 Implement `POST /api/rooms` in `apps/api/src/http/rooms.controller.ts` per OpenAPI (`201 { roomId }` / `503 SERVICE_AT_CAPACITY` with «Сервис переполнен. Попробуйте позже.»)
+- [X] T045 Serve OpenAPI + Scalar at `/api/docs` from `apps/api/src/main.ts` (Express adapter; global prefix `api`)
+- [X] T046 Implement `socketId → participantId` map (never expose socket.id) in `apps/api/src/realtime/socket-participant.map.ts`
+- [X] T047 Implement `RoomsGateway` in `apps/api/src/realtime/rooms.gateway.ts`: Zod on inbound events; acks from `libs/contracts/realtime`; `disconnect` → `LeaveRoom`; Socket.IO room `room:{roomId}`; unicast signaling; no domain logic in the gateway
+- [X] T048 Wire `AppModule` in `apps/api/src/app.module.ts` (use cases, in-memory registry, HTTP, gateway) and CORS from `CORS_ORIGINS`
+- [X] T049 Add Vite proxy in `apps/web/vite.config.ts` for `/api` and `/socket.io` to the API; disable client reconnection in `libs/web/realtime/src/lib/socket-client.ts` (`reconnection: false`)
+- [X] T050 Implement room command client (join/leave/chat/media/signal + typed acks) in `libs/web/realtime/src/lib/room-client.ts`
+- [X] T051 Implement `SignalingPort` interface in `libs/web/webrtc/src/lib/signaling.port.ts` and Socket.IO adapter in `libs/web/realtime/src/lib/signaling-socket.adapter.ts` (web-webrtc must not import socket.io)
+- [X] T052 Add light-theme semantic CSS variables (`background`, `foreground`, `card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`) plus Inter via fontsource in `apps/web/src/app/styles.css` and `libs/web/ui` tokens; structure `.dark` slots but do not ship a dark theme
+- [X] T053 Add shadcn primitives (Button, Input, Textarea, Card, Tooltip, Avatar, Badge, Separator, ScrollArea, Alert) plus `cn` (clsx + tailwind-merge) in `libs/web/ui/src/`; Lucide only; no second icon pack
+- [X] T054 Implement TanStack Router in `apps/web/src/app/router.tsx` with `/` and `/room/$roomId`; QueryClient for HTTP only; no localStorage
+- [X] T055 Implement meeting-session store (`useSyncExternalStore`) in `apps/web/src/features/meeting-session/model/meeting-session.store.ts` with connection-state union; do not put realtime into TanStack Query
+- [X] T056 Create empty FSD public APIs: `apps/web/src/pages/start-page.tsx`, `apps/web/src/pages/room-page.tsx`, `apps/web/src/widgets/control-bar/`, `apps/web/src/widgets/video-grid/`, `apps/web/src/widgets/chat-panel/`, `apps/web/src/widgets/participant-list/`
+- [X] T057 Document every env var (no secrets) in `.env.example`
 
 **Checkpoint**: Foundation ready — `pnpm nx serve api` health + Scalar work; web shell routes render; user stories can start
 

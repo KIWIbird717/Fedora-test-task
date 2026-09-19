@@ -20,5 +20,9 @@
       "type:infra"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@fedora-meetings/api-application": "workspace:*",
+    "@fedora-meetings/api-domain": "workspace:*",
+    "nanoid": "^5.1.5"
+  }
 }

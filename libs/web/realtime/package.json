@@ -20,5 +20,9 @@
       "type:infra"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@fedora-meetings/contracts-realtime": "workspace:*",
+    "@fedora-meetings/web-webrtc": "workspace:*",
+    "socket.io-client": "^4.8.1"
+  }
 }

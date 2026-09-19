@@ -1,6 +1,7 @@
 /// <reference types='vitest' />
-import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
@@ -8,16 +9,23 @@ export default defineConfig(() => ({
   server: {
     port: 5173,
     host: 'localhost',
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/socket.io': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
   },
   preview: {
     port: 5173,
     host: 'localhost',
   },
-  plugins: [react()],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [],
-  // },
+  plugins: [react(), tailwindcss()],
   build: {
     outDir: './dist',
     emptyOutDir: true,
