@@ -8,10 +8,16 @@ import { setDisplayName, useDisplayName } from '../model/display-name.store';
 const FIELD_ID = 'display-name';
 const HINT_ID = 'display-name-hint';
 
-export function DisplayNameField() {
+export function DisplayNameField({
+  serverMessage,
+  onClearServerMessage,
+}: {
+  serverMessage?: string;
+  onClearServerMessage?: () => void;
+}) {
   const value = useDisplayName();
   const validation = validateDisplayName(value);
-  const hint = validation.ok ? undefined : validation.message;
+  const hint = serverMessage ?? (validation.ok ? undefined : validation.message);
 
   return (
     <div className="flex flex-col gap-2">
@@ -28,7 +34,12 @@ export function DisplayNameField() {
         value={value}
         aria-invalid={hint ? true : undefined}
         aria-describedby={hint ? HINT_ID : undefined}
-        onChange={(event) => setDisplayName(event.target.value)}
+        onChange={(event) => {
+          setDisplayName(event.target.value);
+          if (serverMessage) {
+            onClearServerMessage?.();
+          }
+        }}
       />
       {hint ? (
         <p id={HINT_ID} role="alert" className="text-sm text-destructive">

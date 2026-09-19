@@ -6,23 +6,12 @@ const roomIdSchema = z
   .max(32)
   .regex(/^[A-Za-z0-9_-]+$/);
 
-const displayNameSchema = z
-  .string()
-  .transform((value) => value.trim())
-  .pipe(
-    z
-      .string()
-      .min(1)
-      .max(30)
-      .regex(/^[\p{L}\p{N} \-']+$/u),
-  );
-
 const participantIdSchema = z.string().uuid();
 
 export const roomJoinPayloadSchema = z
   .object({
     roomId: roomIdSchema,
-    displayName: displayNameSchema,
+    displayName: z.string(),
   })
   .strict();
 

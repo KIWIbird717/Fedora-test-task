@@ -82,7 +82,16 @@ export function StartPage() {
               {session.connection.status === 'server-error' ? (
                 <ServerError />
               ) : null}
-              <DisplayNameField />
+              <DisplayNameField
+                serverMessage={
+                  session.connection.status === 'idle'
+                    ? session.connection.nameError
+                    : undefined
+                }
+                onClearServerMessage={() => {
+                  setMeetingConnection({ status: 'idle' });
+                }}
+              />
               <Button type="submit" disabled={!validation.ok}>
                 Создать комнату
               </Button>

@@ -51,6 +51,13 @@ export async function joinMeeting(
         setMeetingConnection({ status: 'service-full' });
         return;
       }
+      if (ack.error.code === 'VALIDATION_ERROR') {
+        setMeetingConnection({
+          status: 'idle',
+          nameError: ack.error.message,
+        });
+        return;
+      }
       setMeetingConnection({ status: 'server-error' });
       return;
     }

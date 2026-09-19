@@ -3,6 +3,7 @@ import { io, type Socket } from 'socket.io-client';
 import { parseRoomId } from '@fedora-meetings/api-domain';
 import {
   realtimeEvents,
+  russianMessages,
   systemJoinedText,
   systemLeftText,
   type Ack,
@@ -204,6 +205,55 @@ describe('RoomsGateway', () => {
     const retry = await joinRoom(fifth, { roomId, displayName: 'Даша' });
     expect(retry.ok).toBe(true);
     expect(api.registry.get(parseRoomId(roomId))?.participantCount).toBe(4);
+  });
+
+  it('returns VALIDATION_ERROR with name hints instead of INVALID_PAYLOAD', async () => {
+    const socket = await openSocket();
+    const roomId = 'name-rules-1';
+
+    const empty = await joinRoom(socket, { roomId, displayName: '   ' });
+    expect(empty).toEqual({
+      ok: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: russianMessages.EMPTY_NAME,
+      },
+    });
+
+    const charset = await joinRoom(socket, { roomId, displayName: 'Alex!' });
+    expect(charset).toEqual({
+      ok: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: russianMessages.BAD_NAME_CHARSET,
+      },
+    });
+
+    const tooLong = await joinRoom(socket, {
+      roomId,
+      displayName: 'a'.repeat(31),
+    });
+    expect(tooLong).toEqual({
+      ok: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: russianMessages.NAME_TOO_LONG,
+      },
+    });
+
+    const missingName = await emitAck<RoomJoinResult>(
+      socket,
+      realtimeEvents.roomJoin,
+      { roomId },
+    );
+    expect(missingName).toEqual({
+      ok: false,
+      error: {
+        code: 'INVALID_PAYLOAD',
+        message: russianMessages.INVALID_PAYLOAD,
+      },
+    });
+    expect(api.registry.activeRoomCount()).toBe(0);
   });
 
   async function openSocket(): Promise<Socket> {

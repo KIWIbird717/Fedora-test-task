@@ -443,3 +443,9 @@ Task: "MeshCallSession in libs/web/webrtc/src/lib/mesh-call-session.ts"
 - `POST /api/rooms` must not insert a 0-participant room
 - Constitution Definition of Done applies at each story checkpoint (`tsc`, boundary lint, cleanup of tracks/PCs/sockets)
 - `/speckit-implement` executes this list; it must not tick checkboxes in `checklists/`
+
+---
+
+## Phase 17: Convergence
+
+- [X] T121 CRITICAL: Keep `room:join` Zod to payload shape only so `DisplayName` owns name rules and join acks return `VALIDATION_ERROR` with «Введите имя» / charset / length copy instead of `INVALID_PAYLOAD`; map that ack onto the name field rather than the server-error screen per Constitution VI, FR-038, plan: error handling (contradicts)

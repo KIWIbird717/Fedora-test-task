@@ -9,7 +9,7 @@ import type {
 import type { PeerConnectionState } from '../../../entities/participant/model/peer-connection-state';
 
 export type MeetingConnectionState =
-  | { status: 'idle' }
+  | { status: 'idle'; nameError?: string }
   | { status: 'connecting'; roomId: string }
   | { status: 'in-room'; roomId: string; participantId: string }
   | { status: 'room-full'; roomId: string }

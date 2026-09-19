@@ -41,4 +41,20 @@ describe('DisplayNameField', () => {
     });
     expect(screen.queryByRole('alert')).toBeNull();
   });
+
+  it('shows a server name error on the field and clears it on edit', () => {
+    const onClearServerMessage = vi.fn();
+    render(
+      <DisplayNameField
+        serverMessage={russianMessages.BAD_NAME_CHARSET}
+        onClearServerMessage={onClearServerMessage}
+      />,
+    );
+    expect(screen.getByText(russianMessages.BAD_NAME_CHARSET)).toBeTruthy();
+
+    fireEvent.change(screen.getByLabelText('Имя'), {
+      target: { value: 'Алекс' },
+    });
+    expect(onClearServerMessage).toHaveBeenCalledTimes(1);
+  });
 });
