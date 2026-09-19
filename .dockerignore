@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+.git
+.nx
+.env
+.env.*
+!.env.example
+coverage
+*.log
+.idea
+tmp
+temp
+.DS_Store

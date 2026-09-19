@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "importHelpers": true,
+    "isolatedModules": true,
+    "lib": ["es2022"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2022",
+    "customConditions": ["fedora-meetings"],
+    "baseUrl": ".",
+    "paths": {
+      "@fedora-meetings/api-domain": ["libs/api/domain/src/index.ts"],
+      "@fedora-meetings/api-application": ["libs/api/application/src/index.ts"],
+      "@fedora-meetings/api-infra-memory": [
+        "libs/api/infra-memory/src/index.ts"
+      ],
+      "@fedora-meetings/contracts-http": ["libs/contracts/http/src/index.ts"],
+      "@fedora-meetings/contracts-realtime": [
+        "libs/contracts/realtime/src/index.ts"
+      ],
+      "@fedora-meetings/web-ui": ["libs/web/ui/src/index.ts"],
+      "@fedora-meetings/web-media": ["libs/web/media/src/index.ts"],
+      "@fedora-meetings/web-webrtc": ["libs/web/webrtc/src/index.ts"],
+      "@fedora-meetings/web-realtime": ["libs/web/realtime/src/index.ts"]
+    }
+  }
+}

@@ -18,6 +18,9 @@ coverage/
 
 # OS
 .DS_Store
+Thumbs.db
+*.tmp
+*.swp
 
 # IDE
 .idea/
@@ -28,3 +31,6 @@ coverage/
 # Temporary
 tmp/
 temp/
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
+test-output

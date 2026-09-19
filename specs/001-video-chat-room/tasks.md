@@ -30,24 +30,24 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 **Purpose**: Make the empty Nx stub a tagged, linted, TypeScript-strict monorepo that can host the planned apps and libs.
 
-- [ ] T001 Rename root `package.json` `"name"` to `fedora-meetings` and add `packages: ['apps/*', 'libs/**']` in `pnpm-workspace.yaml` (keep `allowBuilds.nx`)
-- [ ] T002 Add Nx plugins (`@nx/js`, `@nx/eslint`, `@nx/vite`, `@nx/react`, `@nx/nest`, `@nx/node`, `@nx/playwright`, `@nx/vitest`, `@nx/docker`) matching Nx 23.2.1 and configure `nx.json` plugins/named inputs
-- [ ] T003 [P] Add root TypeScript strict config in `tsconfig.base.json` (`strict: true`, path aliases only to library public entry points)
-- [ ] T004 [P] Add ESLint + Prettier in `eslint.config.mjs` and `.prettierrc` with `@nx/enforce-module-boundaries` tags/constraints from plan.md (domain must not import nestjs/socket.io/zod)
-- [ ] T005 Generate Nest app `apps/api` (`scope:api,type:app`) with Vitest (not Jest) via Nx generator
-- [ ] T006 Generate Vite React app `apps/web` (`scope:web,type:app`) with FSD directories `apps/web/src/{app,pages,widgets,features,entities,shared}`
-- [ ] T007 Generate Playwright project `apps/web-e2e` (`scope:web,type:e2e`)
-- [ ] T008 [P] Generate lib `libs/api/domain` (`scope:api,type:domain`) public entry `libs/api/domain/src/index.ts`
-- [ ] T009 [P] Generate lib `libs/api/application` (`scope:api,type:application`) public entry `libs/api/application/src/index.ts`
-- [ ] T010 [P] Generate lib `libs/api/infra-memory` (`scope:api,type:infra`) public entry `libs/api/infra-memory/src/index.ts`
-- [ ] T011 [P] Generate lib `libs/contracts/http` (`scope:shared,type:contracts`) public entry `libs/contracts/http/src/index.ts`
-- [ ] T012 [P] Generate lib `libs/contracts/realtime` (`scope:shared,type:contracts`) public entry `libs/contracts/realtime/src/index.ts`
-- [ ] T013 [P] Generate lib `libs/web/ui` (`scope:web,type:ui`) public entry `libs/web/ui/src/index.ts`
-- [ ] T014 [P] Generate lib `libs/web/media` (`scope:web,type:infra`) public entry `libs/web/media/src/index.ts`
-- [ ] T015 [P] Generate lib `libs/web/webrtc` (`scope:web,type:infra`) public entry `libs/web/webrtc/src/index.ts`
-- [ ] T016 [P] Generate lib `libs/web/realtime` (`scope:web,type:infra`) public entry `libs/web/realtime/src/index.ts`
-- [ ] T017 Wire workspace deps in `apps/api/package.json` and `apps/web/package.json` (api → domain/application/infra-memory/contracts; web → contracts + web-* libs) without tsconfig path hacks
-- [ ] T018 Add Vitest targets in each project's `package.json`/`project.json` for domain, application, infra-memory, web-webrtc, web-media, api, web; confirm `pnpm nx graph` shows no cycles
+- [X] T001 Rename root `package.json` `"name"` to `fedora-meetings` and add `packages: ['apps/*', 'libs/**']` in `pnpm-workspace.yaml` (keep `allowBuilds.nx`)
+- [X] T002 Add Nx plugins (`@nx/js`, `@nx/eslint`, `@nx/vite`, `@nx/react`, `@nx/nest`, `@nx/node`, `@nx/playwright`, `@nx/vitest`, `@nx/docker`) matching Nx 23.2.1 and configure `nx.json` plugins/named inputs
+- [X] T003 [P] Add root TypeScript strict config in `tsconfig.base.json` (`strict: true`, path aliases only to library public entry points)
+- [X] T004 [P] Add ESLint + Prettier in `eslint.config.mjs` and `.prettierrc` with `@nx/enforce-module-boundaries` tags/constraints from plan.md (domain must not import nestjs/socket.io/zod)
+- [X] T005 Generate Nest app `apps/api` (`scope:api,type:app`) with Vitest (not Jest) via Nx generator
+- [X] T006 Generate Vite React app `apps/web` (`scope:web,type:app`) with FSD directories `apps/web/src/{app,pages,widgets,features,entities,shared}`
+- [X] T007 Generate Playwright project `apps/web-e2e` (`scope:web,type:e2e`)
+- [X] T008 [P] Generate lib `libs/api/domain` (`scope:api,type:domain`) public entry `libs/api/domain/src/index.ts`
+- [X] T009 [P] Generate lib `libs/api/application` (`scope:api,type:application`) public entry `libs/api/application/src/index.ts`
+- [X] T010 [P] Generate lib `libs/api/infra-memory` (`scope:api,type:infra`) public entry `libs/api/infra-memory/src/index.ts`
+- [X] T011 [P] Generate lib `libs/contracts/http` (`scope:shared,type:contracts`) public entry `libs/contracts/http/src/index.ts`
+- [X] T012 [P] Generate lib `libs/contracts/realtime` (`scope:shared,type:contracts`) public entry `libs/contracts/realtime/src/index.ts`
+- [X] T013 [P] Generate lib `libs/web/ui` (`scope:web,type:ui`) public entry `libs/web/ui/src/index.ts`
+- [X] T014 [P] Generate lib `libs/web/media` (`scope:web,type:infra`) public entry `libs/web/media/src/index.ts`
+- [X] T015 [P] Generate lib `libs/web/webrtc` (`scope:web,type:infra`) public entry `libs/web/webrtc/src/index.ts`
+- [X] T016 [P] Generate lib `libs/web/realtime` (`scope:web,type:infra`) public entry `libs/web/realtime/src/index.ts`
+- [X] T017 Wire workspace deps in `apps/api/package.json` and `apps/web/package.json` (api → domain/application/infra-memory/contracts; web → contracts + web-* libs) without tsconfig path hacks
+- [X] T018 Add Vitest targets in each project's `package.json`/`project.json` for domain, application, infra-memory, web-webrtc, web-media, api, web; confirm `pnpm nx graph` shows no cycles
 
 **Checkpoint**: Workspace exists; no product behaviour yet
 

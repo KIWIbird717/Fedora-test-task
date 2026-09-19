@@ -1,0 +1,20 @@
+{
+  "name": "@fedora-meetings/web",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "web",
+    "tags": [
+      "scope:web",
+      "type:app"
+    ]
+  },
+  "dependencies": {
+    "@fedora-meetings/contracts-http": "workspace:*",
+    "@fedora-meetings/contracts-realtime": "workspace:*",
+    "@fedora-meetings/web-media": "workspace:*",
+    "@fedora-meetings/web-realtime": "workspace:*",
+    "@fedora-meetings/web-ui": "workspace:*",
+    "@fedora-meetings/web-webrtc": "workspace:*"
+  }
+}

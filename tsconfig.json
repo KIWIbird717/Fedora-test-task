@@ -1,0 +1,43 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/api"
+    },
+    {
+      "path": "./apps/web-e2e"
+    },
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "./libs/api/domain"
+    },
+    {
+      "path": "./libs/api/application"
+    },
+    {
+      "path": "./libs/api/infra-memory"
+    },
+    {
+      "path": "./libs/contracts/http"
+    },
+    {
+      "path": "./libs/contracts/realtime"
+    },
+    {
+      "path": "./libs/web/media"
+    },
+    {
+      "path": "./libs/web/webrtc"
+    },
+    {
+      "path": "./libs/web/realtime"
+    },
+    {
+      "path": "./libs/web/ui"
+    }
+  ]
+}
