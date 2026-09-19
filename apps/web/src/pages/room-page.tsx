@@ -147,7 +147,7 @@ function InRoomLayout() {
 
   return (
     <main className="flex min-h-screen bg-background text-foreground">
-      <div className="relative flex min-h-screen min-w-0 flex-1 flex-col">
+      <div className="relative flex min-h-screen min-w-0 flex-1 flex-col max-h-screen">
         {session.mediaPermissionDenied ? <MediaPermissionAlert /> : null}
         <VideoGrid
           self={self}

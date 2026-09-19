@@ -1,4 +1,7 @@
-import { russianMessages, type ParticipantDto } from '@fedora-meetings/contracts-realtime';
+import {
+  russianMessages,
+  type ParticipantDto,
+} from '@fedora-meetings/contracts-realtime';
 import { cn } from '@fedora-meetings/web-ui';
 import type { PeerConnectionState } from '../../../entities/participant/model/peer-connection-state';
 import { RemoteTile } from '../../../entities/participant/ui/remote-tile';
@@ -38,7 +41,7 @@ export function VideoGrid({
       ) : (
         <div
           className={cn(
-            'grid flex-1 gap-3 p-4',
+            'grid flex-1 gap-3 p-4 max-h-[-webkit-fill-available]',
             remotes.length === 1 ? 'grid-cols-1' : 'grid-cols-2',
           )}
         >

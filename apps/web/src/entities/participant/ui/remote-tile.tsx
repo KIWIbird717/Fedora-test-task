@@ -1,4 +1,7 @@
-import { russianMessages, type ParticipantDto } from '@fedora-meetings/contracts-realtime';
+import {
+  russianMessages,
+  type ParticipantDto,
+} from '@fedora-meetings/contracts-realtime';
 import { useEffect, useRef } from 'react';
 import {
   isFailedPeerMedia,
