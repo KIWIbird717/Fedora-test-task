@@ -15,7 +15,7 @@ export function ChatMessageItem({ message }: { message: ChatMessageDto }) {
           {formatChatTime(message.sentAt)}
         </time>
       </header>
-      <p className="whitespace-pre-wrap break-words text-sm text-foreground">
+      <p className="whitespace-pre-wrap wrap-anywhere text-sm text-foreground">
         {message.text}
       </p>
     </article>

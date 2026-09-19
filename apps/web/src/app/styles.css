@@ -2,6 +2,8 @@
 @import '@fontsource-variable/inter';
 @import '@fedora-meetings/web-ui/tokens.css';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../../../libs/web/ui/src/**/*.{ts,tsx}';
 @source '../../**/*.{ts,tsx}';
 
