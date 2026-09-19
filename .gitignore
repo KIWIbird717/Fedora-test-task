@@ -1,7 +1,30 @@
-node_modules
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
+coverage/
+.nx/cache/
+.nx/workspace-data/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# OS
 .DS_Store
 
+# IDE
+.idea/
 
-.nx/cache
-.nx/workspace-data
-.nx/migrate-runs
+# Local Cursor state
+.cursor/*.json
+
+# Temporary
+tmp/
+temp/
