@@ -4,6 +4,7 @@ import type {
   IceServerDto,
   ParticipantDto,
   RoomJoinResult,
+  SystemEventDto,
 } from '@fedora-meetings/contracts-realtime';
 
 export type MeetingConnectionState =
@@ -20,6 +21,7 @@ export type MeetingSessionState = {
   connection: MeetingConnectionState;
   participants: ParticipantDto[];
   messages: ChatMessageDto[];
+  systemEvents: SystemEventDto[];
   iceServers: IceServerDto[];
   localStream: MediaStream | undefined;
   localMicrophoneEnabled: boolean;
@@ -33,6 +35,7 @@ const initialState: MeetingSessionState = {
   connection: { status: 'idle' },
   participants: [],
   messages: [],
+  systemEvents: [],
   iceServers: [],
   localStream: undefined,
   localMicrophoneEnabled: false,
@@ -109,6 +112,24 @@ export function appendMeetingMessage(message: ChatMessageDto): void {
   state = {
     ...state,
     messages: [...state.messages, message],
+  };
+  emit();
+}
+
+export function appendMeetingSystemEvent(event: SystemEventDto): void {
+  if (
+    state.systemEvents.some(
+      (existing) =>
+        existing.kind === event.kind &&
+        existing.participantId === event.participantId &&
+        existing.occurredAt === event.occurredAt,
+    )
+  ) {
+    return;
+  }
+  state = {
+    ...state,
+    systemEvents: [...state.systemEvents, event],
   };
   emit();
 }

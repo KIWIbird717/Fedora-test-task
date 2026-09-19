@@ -17,6 +17,7 @@ import { DisplayNameField } from '../features/enter-room/ui/display-name-field';
 import { RoomFullState } from '../features/enter-room/ui/room-full-state';
 import { ChatPanel } from '../widgets/chat-panel';
 import { ControlBar } from '../widgets/control-bar';
+import { ParticipantList } from '../widgets/participant-list';
 import { VideoGrid } from '../widgets/video-grid';
 import { EnableSoundButton } from '../features/meeting-session/ui/enable-sound-button';
 import { captureEntryGesture } from '../features/meeting-session/model/autoplay';
@@ -25,6 +26,7 @@ import {
   setMeetingConnection,
   useMeetingSession,
 } from '../features/meeting-session/model/meeting-session.store';
+import { useSessionTeardown } from '../features/meeting-session/model/teardown-session';
 import { useMeshCall } from '../features/meeting-session/model/use-mesh-call';
 
 export function RoomPage() {
@@ -112,6 +114,7 @@ async function retryJoin(roomId: string, displayName: string): Promise<void> {
 function InRoomLayout() {
   const session = useMeetingSession();
   useMeshCall();
+  useSessionTeardown();
 
   if (session.connection.status !== 'in-room') {
     return null;
@@ -139,7 +142,10 @@ function InRoomLayout() {
         <EnableSoundButton />
         <ControlBar />
       </div>
-      <ChatPanel />
+      <aside className="hidden h-screen w-80 shrink-0 flex-col border-l border-border bg-card lg:flex">
+        <ParticipantList />
+        <ChatPanel />
+      </aside>
     </main>
   );
 }

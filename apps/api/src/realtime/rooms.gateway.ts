@@ -81,20 +81,20 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayDisconnect {
   }
 
   @SubscribeMessage(realtimeEvents.roomJoin)
-  onJoin(
+  async onJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: unknown,
-  ): Ack<RoomJoinResult> {
+  ): Promise<Ack<RoomJoinResult>> {
     const parsed = parsePayload(roomJoinPayloadSchema, payload);
     if (!parsed.ok) {
       return parsed;
     }
 
     try {
-      this.leaveCurrentRoom(client);
+      await this.leaveCurrentRoom(client);
       const result = this.joinRoom.execute(parsed.data);
       this.sockets.bind(client.id, result.participant.id, result.roomId);
-      void client.join(socketRoomName(result.roomId));
+      await client.join(socketRoomName(result.roomId));
       return {
         ok: true,
         data: {
@@ -111,10 +111,10 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayDisconnect {
   }
 
   @SubscribeMessage(realtimeEvents.roomLeave)
-  onLeave(
+  async onLeave(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: unknown,
-  ): Ack<RoomLeaveResult> {
+  ): Promise<Ack<RoomLeaveResult>> {
     const parsed = parsePayload(roomLeavePayloadSchema, payload);
     if (!parsed.ok) {
       return parsed;
@@ -129,7 +129,7 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayDisconnect {
         participantId: membership.data.participantId,
       });
       this.sockets.unbindBySocket(client.id);
-      void client.leave(socketRoomName(membership.data.roomId));
+      await client.leave(socketRoomName(membership.data.roomId));
       return { ok: true, data: { roomId: result.roomId } };
     } catch (error) {
       return failure(error, this.logger);
@@ -271,7 +271,7 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayDisconnect {
     }
   }
 
-  private leaveCurrentRoom(client: Socket): void {
+  private async leaveCurrentRoom(client: Socket): Promise<void> {
     const previous = this.sockets.getBySocket(client.id);
     if (!previous) {
       return;
@@ -280,7 +280,7 @@ export class RoomsGateway implements OnGatewayInit, OnGatewayDisconnect {
       roomId: previous.roomId,
       participantId: previous.participantId,
     });
-    void client.leave(socketRoomName(previous.roomId));
+    await client.leave(socketRoomName(previous.roomId));
     this.sockets.unbindBySocket(client.id);
   }
 

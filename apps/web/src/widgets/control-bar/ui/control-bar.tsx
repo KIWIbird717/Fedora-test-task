@@ -10,6 +10,7 @@ import {
 } from '@fedora-meetings/web-ui';
 import type { ReactNode } from 'react';
 import { CopyInviteButton } from '../../../features/copy-invite-link/ui/copy-invite-button';
+import { LeaveButton } from '../../../features/leave-room/ui/leave-button';
 import {
   setCameraEnabled,
   setMicrophoneEnabled,
@@ -50,6 +51,7 @@ export function ControlBar() {
         {cameraEnabled ? <Video /> : <VideoOff />}
       </ControlIconButton>
       <CopyInviteButton />
+      <LeaveButton />
     </nav>
   );
 }

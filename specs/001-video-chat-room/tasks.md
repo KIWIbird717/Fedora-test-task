@@ -252,9 +252,9 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 9
 
-- [ ] T095 [US9] Participant list widget in `apps/web/src/widgets/participant-list/ui/participant-list.tsx` bound to meeting-session roster
-- [ ] T096 [US9] Append `chat:system` live as «{name} присоединился к комнате» / «{name} вышел из комнаты» in `apps/web/src/entities/chat-message/ui/system-event.tsx`; do not seed these from join history
-- [ ] T097 [US9] Server emits system events on join/leave in `apps/api/src/realtime/rooms.gateway.ts` without storing them on `Room`
+- [X] T095 [US9] Participant list widget in `apps/web/src/widgets/participant-list/ui/participant-list.tsx` bound to meeting-session roster
+- [X] T096 [US9] Append `chat:system` live as «{name} присоединился к комнате» / «{name} вышел из комнаты» in `apps/web/src/entities/chat-message/ui/system-event.tsx`; do not seed these from join history
+- [X] T097 [US9] Server emits system events on join/leave in `apps/api/src/realtime/rooms.gateway.ts` without storing them on `Room`
 
 **Checkpoint**: Roster and live system lines work
 
@@ -268,9 +268,9 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 10
 
-- [ ] T098 [US10] Leave control (`PhoneOff`, destructive variant, Tooltip, `aria-label`, **no confirm dialog**) calling `room:leave` then dispose mesh/media and navigate `/` in `apps/web/src/features/leave-room/ui/leave-button.tsx`
-- [ ] T099 [US10] `beforeunload`/socket disconnect already maps to `LeaveRoom` in `apps/api/src/realtime/rooms.gateway.ts`; client teardown in `apps/web/src/features/meeting-session/model/teardown-session.ts`
-- [ ] T100 [US10] Integration test: last leave deletes registry entry and chat; same id join is empty in `libs/api/infra-memory/src/lib/in-memory-room-registry.spec.ts`
+- [X] T098 [US10] Leave control (`PhoneOff`, destructive variant, Tooltip, `aria-label`, **no confirm dialog**) calling `room:leave` then dispose mesh/media and navigate `/` in `apps/web/src/features/leave-room/ui/leave-button.tsx`
+- [X] T099 [US10] `beforeunload`/socket disconnect already maps to `LeaveRoom` in `apps/api/src/realtime/rooms.gateway.ts`; client teardown in `apps/web/src/features/meeting-session/model/teardown-session.ts`
+- [X] T100 [US10] Integration test: last leave deletes registry entry and chat; same id join is empty in `libs/api/infra-memory/src/lib/in-memory-room-registry.spec.ts`
 
 **Checkpoint**: No phantom tiles; rooms do not leak after last leave
 

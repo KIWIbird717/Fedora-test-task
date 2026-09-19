@@ -3,9 +3,13 @@ import { io, type Socket } from 'socket.io-client';
 import { parseRoomId } from '@fedora-meetings/api-domain';
 import {
   realtimeEvents,
+  systemJoinedText,
+  systemLeftText,
   type Ack,
   type RoomJoinPayload,
   type RoomJoinResult,
+  type RoomLeaveResult,
+  type SystemEventDto,
 } from '@fedora-meetings/contracts-realtime';
 import { createTestApi, type TestApi } from '../testing/create-test-app';
 
@@ -98,6 +102,83 @@ describe('RoomsGateway', () => {
     expect(api.registry.get(parseRoomId(roomId))?.participantCount).toBe(2);
   });
 
+  it('emits live join/leave system events without storing them on the room', async () => {
+    const roomId = 'sys-events1';
+    const first = await openSocket();
+    await joinRoom(first, { roomId, displayName: 'Анна' });
+
+    const joinedEvent = waitForSystem(first);
+    const second = await openSocket();
+    const secondAck = await joinRoom(second, { roomId, displayName: 'Борис' });
+    expect(secondAck.ok).toBe(true);
+    if (secondAck.ok) {
+      expect(secondAck.data.messages).toEqual([]);
+    }
+
+    const joined = await joinedEvent;
+    expect(joined).toMatchObject({
+      kind: 'joined',
+      displayName: 'Борис',
+    });
+    expect(systemJoinedText(joined.displayName)).toBe(
+      'Борис присоединился к комнате',
+    );
+    expect(api.registry.get(parseRoomId(roomId))?.messages).toEqual([]);
+
+    const leftEvent = waitForSystem(first);
+    const leaveAck = await leaveRoom(second);
+    expect(leaveAck.ok).toBe(true);
+
+    const left = await leftEvent;
+    expect(left).toMatchObject({
+      kind: 'left',
+      displayName: 'Борис',
+    });
+    expect(systemLeftText(left.displayName)).toBe('Борис вышел из комнаты');
+    expect(left.displayName).not.toContain('соединение потеряно');
+    expect(api.registry.get(parseRoomId(roomId))?.messages).toEqual([]);
+    expect(api.registry.get(parseRoomId(roomId))?.participantCount).toBe(1);
+
+    const lastLeave = await leaveRoom(first);
+    expect(lastLeave.ok).toBe(true);
+    expect(api.registry.get(parseRoomId(roomId))).toBeUndefined();
+
+    const again = await openSocket();
+    const rejoin = await joinRoom(again, { roomId, displayName: 'Анна' });
+    expect(rejoin.ok).toBe(true);
+    if (rejoin.ok) {
+      expect(rejoin.data.messages).toEqual([]);
+      expect(rejoin.data.participants).toHaveLength(1);
+    }
+  });
+
+  it('treats socket disconnect as leave and deletes the room on last disconnect', async () => {
+    const roomId = 'sys-disc-01';
+    const first = await openSocket();
+    await joinRoom(first, { roomId, displayName: 'Анна' });
+    const second = await openSocket();
+    await joinRoom(second, { roomId, displayName: 'Борис' });
+
+    const leftEvent = waitForSystem(first);
+    second.disconnect();
+    const left = await leftEvent;
+    expect(left.kind).toBe('left');
+    expect(left.displayName).toBe('Борис');
+    expect(api.registry.get(parseRoomId(roomId))?.participantCount).toBe(1);
+
+    first.disconnect();
+    await waitUntil(() => api.registry.get(parseRoomId(roomId)) === undefined);
+    expect(api.registry.activeRoomCount()).toBe(0);
+
+    const again = await openSocket();
+    const ack = await joinRoom(again, { roomId, displayName: 'Анна' });
+    expect(ack.ok).toBe(true);
+    if (ack.ok) {
+      expect(ack.data.messages).toEqual([]);
+      expect(ack.data.participants).toHaveLength(1);
+    }
+  });
+
   async function openSocket(): Promise<Socket> {
     const socket = io(api.origin, {
       path: '/socket.io',
@@ -117,19 +198,50 @@ function joinRoom(
   socket: Socket,
   payload: RoomJoinPayload,
 ): Promise<Ack<RoomJoinResult>> {
+  return emitAck(socket, realtimeEvents.roomJoin, payload);
+}
+
+function leaveRoom(socket: Socket): Promise<Ack<RoomLeaveResult>> {
+  return emitAck(socket, realtimeEvents.roomLeave, {});
+}
+
+function waitForSystem(socket: Socket): Promise<SystemEventDto> {
+  return new Promise((resolve) => {
+    socket.once(realtimeEvents.chatSystem, resolve);
+  });
+}
+
+function waitUntil(predicate: () => boolean): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const startedAt = Date.now();
+    const timer = setInterval(() => {
+      if (predicate()) {
+        clearInterval(timer);
+        resolve();
+        return;
+      }
+      if (Date.now() - startedAt > 5_000) {
+        clearInterval(timer);
+        reject(new Error('Timed out waiting for condition'));
+      }
+    }, 20);
+  });
+}
+
+function emitAck<T>(
+  socket: Socket,
+  event: string,
+  payload: unknown,
+): Promise<Ack<T>> {
   return new Promise((resolve, reject) => {
     socket
       .timeout(5_000)
-      .emit(
-        realtimeEvents.roomJoin,
-        payload,
-        (error: Error | null, ack: Ack<RoomJoinResult>) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-          resolve(ack);
-        },
-      );
+      .emit(event, payload, (error: Error | null, ack: Ack<T>) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(ack);
+      });
   });
 }

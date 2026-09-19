@@ -5,6 +5,7 @@ import { bindChatMessages } from '../../send-chat/model/send-chat';
 import { setActiveRoomClient } from './active-room-client';
 import {
   addMeetingParticipant,
+  appendMeetingSystemEvent,
   applyJoinAck,
   getMeetingSessionSnapshot,
   removeMeetingParticipant,
@@ -101,6 +102,7 @@ function bindSessionEvents(client: RoomClient): void {
     },
   });
   const unwatchChat = bindChatMessages(client);
+  const unwatchSystem = client.onChatSystem(appendMeetingSystemEvent);
   const unwatchMedia = client.onMediaStateChanged((payload) => {
     updateMeetingParticipantMedia(payload.participantId, {
       microphoneEnabled: payload.microphoneEnabled,
@@ -110,6 +112,17 @@ function bindSessionEvents(client: RoomClient): void {
   unwatchSession = () => {
     unwatchRoster();
     unwatchChat();
+    unwatchSystem();
     unwatchMedia();
   };
+}
+
+export function releaseMeetingRealtime(): void {
+  unwatchSession?.();
+  unwatchSession = undefined;
+  socket?.disconnect();
+  socket = undefined;
+  roomClient = undefined;
+  setActiveRoomClient(undefined);
+  joinInFlightFor = undefined;
 }

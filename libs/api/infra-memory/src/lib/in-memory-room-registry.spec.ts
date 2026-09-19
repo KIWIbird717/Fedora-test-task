@@ -1,4 +1,6 @@
 import {
+  ChatMessage,
+  ChatText,
   DisplayName,
   MediaState,
   parseRoomId,
@@ -66,5 +68,41 @@ describe('InMemoryRoomRegistry', () => {
     expect(rejected).toHaveLength(1);
     expect(rejected[0]).toBeInstanceOf(RoomFullError);
     expect(registry.get(roomId)?.participantCount).toBe(4);
+  });
+
+  it('deletes the registry entry and chat on last leave; same id join is empty', () => {
+    const registry = new InMemoryRoomRegistry(50);
+    const roomId = parseRoomId('roomid12ab');
+    const first = joinAs(registry, roomId, 'Alex');
+    const second = joinAs(registry, roomId, 'Sam');
+    first.room.appendMessage(
+      ChatMessage.create({
+        authorId: first.participant.id,
+        authorName: 'Alex',
+        text: ChatText.create('previous chat'),
+        sentAt: new Date('2026-09-19T00:00:01.000Z'),
+      }),
+    );
+
+    const afterFirstLeave = registry.leave(roomId, first.participant.id);
+    expect(afterFirstLeave.kind).toBe('left');
+    if (afterFirstLeave.kind === 'left') {
+      expect(afterFirstLeave.roomDeleted).toBe(false);
+    }
+    expect(registry.get(roomId)?.messages).toHaveLength(1);
+
+    const lastLeave = registry.leave(roomId, second.participant.id);
+    expect(lastLeave).toEqual({
+      kind: 'left',
+      displayName: 'Sam',
+      roomDeleted: true,
+    });
+    expect(registry.get(roomId)).toBeUndefined();
+    expect(registry.activeRoomCount()).toBe(0);
+
+    const rejoined = joinAs(registry, roomId, 'Alex');
+    expect(rejoined.created).toBe(true);
+    expect(rejoined.room.messages).toEqual([]);
+    expect(rejoined.room.participants).toHaveLength(1);
   });
 });
