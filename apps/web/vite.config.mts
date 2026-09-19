@@ -24,6 +24,17 @@ export default defineConfig(() => ({
   preview: {
     port: 5173,
     host: 'localhost',
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/socket.io': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
   },
   plugins: [react(), tailwindcss()],
   build: {

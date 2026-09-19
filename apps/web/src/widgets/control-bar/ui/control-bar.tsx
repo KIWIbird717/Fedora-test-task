@@ -34,6 +34,7 @@ export function ControlBar() {
     >
       <ControlIconButton
         label={microphoneLabel}
+        pressed={microphoneEnabled}
         disabled={!mediaReady}
         onClick={() => {
           void setMicrophoneEnabled(!microphoneEnabled);
@@ -43,6 +44,7 @@ export function ControlBar() {
       </ControlIconButton>
       <ControlIconButton
         label={cameraLabel}
+        pressed={cameraEnabled}
         disabled={!mediaReady}
         onClick={() => {
           void setCameraEnabled(!cameraEnabled);
@@ -58,11 +60,13 @@ export function ControlBar() {
 
 function ControlIconButton({
   label,
+  pressed,
   disabled,
   onClick,
   children,
 }: {
   label: string;
+  pressed: boolean;
   disabled: boolean;
   onClick: () => void;
   children: ReactNode;
@@ -75,6 +79,7 @@ function ControlIconButton({
           variant="secondary"
           size="icon"
           aria-label={label}
+          aria-pressed={pressed}
           disabled={disabled}
           onClick={onClick}
         >

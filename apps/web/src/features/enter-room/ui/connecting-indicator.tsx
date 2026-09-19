@@ -8,7 +8,7 @@ export function ConnectingIndicator() {
       aria-live="polite"
     >
       <div
-        className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary"
+        className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary motion-reduce:animate-none"
         aria-hidden="true"
       />
       <p className="text-sm text-muted-foreground">{russianMessages.CONNECTING}</p>

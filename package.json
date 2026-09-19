@@ -3,7 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "description": "",
-  "scripts": {},
+  "scripts": {
+    "compose:up": "docker compose up --build -d",
+    "compose:down": "docker compose down",
+    "compose:rebuild": "docker compose build --no-cache",
+    "compose:logs": "docker compose logs -f",
+    "serve:api": "nx serve api",
+    "serve:web": "nx serve web",
+    "test": "nx run-many -t test",
+    "e2e": "nx e2e web-e2e"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -67,7 +76,9 @@
     "webpack-cli": "^7.0.0",
     "webpack-dev-server": "^5.2.1"
   },
-  "nx": {},
+  "nx": {
+    "includedScripts": []
+  },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",

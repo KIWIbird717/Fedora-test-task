@@ -1,6 +1,6 @@
 # Quickstart: Video Chat Room
 
-Validation guide for the planned local stack. Commands below are the **intended** developer interface after implementation. Do not treat them as already present — this repository currently has no apps, Dockerfiles, or Compose files.
+Validation guide for the local stack after implementation.
 
 Prerequisites: Node.js 22, pnpm 12.4.2 (see root `packageManager`), Docker with Compose v2, Chrome/Firefox/Edge 100+ for media.
 

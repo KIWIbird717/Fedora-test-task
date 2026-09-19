@@ -6,7 +6,7 @@ import { queryClient, router } from './router';
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
+      <TooltipProvider delayDuration={200} skipDelayDuration={0}>
         <RouterProvider router={router} />
       </TooltipProvider>
     </QueryClientProvider>

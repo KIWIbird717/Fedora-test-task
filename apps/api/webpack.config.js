@@ -4,10 +4,23 @@ const { join } = require('path');
 module.exports = {
   output: {
     path: join(__dirname, 'dist'),
-    clean: true,
+    // Cleaning dist during watch deletes the file Node is executing, so serve
+    // cannot restart after a rebuild (including noisy spec-file saves).
+    clean: process.env.NODE_ENV === 'production',
     ...(process.env.NODE_ENV !== 'production' && {
       devtoolModuleFilenameTemplate: '[absolute-resource-path]',
     }),
+  },
+  watchOptions: {
+    ignored: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/out-tsc/**',
+      '**/*.spec.ts',
+      '**/*.spec.tsx',
+      '**/*.test.ts',
+      '**/*.test.tsx',
+    ],
   },
   plugins: [
     new NxAppWebpackPlugin({

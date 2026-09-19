@@ -329,16 +329,16 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 **Purpose**: Docker, a11y, E2E, quickstart commands. No extra product features.
 
-- [ ] T111 [P] Multi-stage `apps/api/Dockerfile` (Node 22, pnpm, non-root runtime, prune-lockfile if used) with context repository root
-- [ ] T112 [P] Multi-stage `apps/web/Dockerfile` (build static → nginx; proxy `/api` and `/socket.io` with websocket upgrade; non-root; SPA fallback)
-- [ ] T113 Add root `.dockerignore` excluding `node_modules`, `dist`, `.git`, `.nx`, `.env`, coverage
-- [ ] T114 Add `docker-compose.yml` (services `api`+`web`, bridge network, published ports, api healthcheck `GET /api/health`, **no app volumes**, no DB/Redis/TURN)
-- [ ] T115 Add root scripts in `package.json`: `compose:up`, `compose:down`, `compose:rebuild`, `compose:logs`, plus nx serve/test shortcuts from quickstart.md
-- [ ] T116 Enable `@nx/docker` inferred `docker:build` / `docker:run` for `api` and `web` in `nx.json`
-- [ ] T117 Keyboard + visible `focus-visible` on meeting controls; contrast via tokens; icon-only names already required — pass in `apps/web/src/widgets/control-bar/ui/control-bar.tsx` and room page (WCAG 2.2 AA as applicable, desktop ≥1024)
-- [ ] T118 Playwright journeys in `apps/web-e2e/src/` with fake media flags: create room, join by link, room full, chat, media toggles, leave (constitution E2E list)
-- [ ] T119 XSS e2e: name and chat markup render inert in `apps/web-e2e/src/xss.spec.ts`
-- [ ] T120 Run `pnpm nx run-many -t lint,typecheck,test` and execute [quickstart.md](./quickstart.md) locally (serve + compose) without adding unspecified features
+- [X] T111 [P] Multi-stage `apps/api/Dockerfile` (Node 22, pnpm, non-root runtime, prune-lockfile if used) with context repository root
+- [X] T112 [P] Multi-stage `apps/web/Dockerfile` (build static → nginx; proxy `/api` and `/socket.io` with websocket upgrade; non-root; SPA fallback)
+- [X] T113 Add root `.dockerignore` excluding `node_modules`, `dist`, `.git`, `.nx`, `.env`, coverage
+- [X] T114 Add `docker-compose.yml` (services `api`+`web`, bridge network, published ports, api healthcheck `GET /api/health`, **no app volumes**, no DB/Redis/TURN)
+- [X] T115 Add root scripts in `package.json`: `compose:up`, `compose:down`, `compose:rebuild`, `compose:logs`, plus nx serve/test shortcuts from quickstart.md
+- [X] T116 Enable `@nx/docker` inferred `docker:build` / `docker:run` for `api` and `web` in `nx.json`
+- [X] T117 Keyboard + visible `focus-visible` on meeting controls; contrast via tokens; icon-only names already required — pass in `apps/web/src/widgets/control-bar/ui/control-bar.tsx` and room page (WCAG 2.2 AA as applicable, desktop ≥1024)
+- [X] T118 Playwright journeys in `apps/web-e2e/src/` with fake media flags: create room, join by link, room full, chat, media toggles, leave (constitution E2E list)
+- [X] T119 XSS e2e: name and chat markup render inert in `apps/web-e2e/src/xss.spec.ts`
+- [X] T120 Run `pnpm nx run-many -t lint,typecheck,test` and execute [quickstart.md](./quickstart.md) locally (serve + compose) without adding unspecified features
 
 ---
 
