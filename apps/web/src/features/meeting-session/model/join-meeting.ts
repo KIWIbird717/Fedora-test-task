@@ -9,6 +9,7 @@ import {
   getMeetingSessionSnapshot,
   removeMeetingParticipant,
   setMeetingConnection,
+  updateMeetingParticipantMedia,
 } from './meeting-session.store';
 
 let socket: ReturnType<typeof createSocket> | undefined;
@@ -100,8 +101,15 @@ function bindSessionEvents(client: RoomClient): void {
     },
   });
   const unwatchChat = bindChatMessages(client);
+  const unwatchMedia = client.onMediaStateChanged((payload) => {
+    updateMeetingParticipantMedia(payload.participantId, {
+      microphoneEnabled: payload.microphoneEnabled,
+      cameraEnabled: payload.cameraEnabled,
+    });
+  });
   unwatchSession = () => {
     unwatchRoster();
     unwatchChat();
+    unwatchMedia();
   };
 }

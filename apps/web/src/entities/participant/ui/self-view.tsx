@@ -1,5 +1,6 @@
 import type { ParticipantDto } from '@fedora-meetings/contracts-realtime';
 import { useEffect, useRef } from 'react';
+import { MediaIndicators } from './media-indicators';
 import { ParticipantName } from './participant-name';
 import { ParticipantSilhouette } from './participant-silhouette';
 
@@ -7,10 +8,12 @@ export function SelfView({
   participant,
   stream,
   cameraEnabled,
+  microphoneEnabled,
 }: {
   participant: ParticipantDto;
   stream: MediaStream | undefined;
   cameraEnabled: boolean;
+  microphoneEnabled: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const showVideo = cameraEnabled && hasLiveVideo(stream);
@@ -42,6 +45,10 @@ export function SelfView({
             <ParticipantSilhouette className="h-12 w-12" />
           </div>
         )}
+        <MediaIndicators
+          microphoneEnabled={microphoneEnabled}
+          cameraEnabled={cameraEnabled}
+        />
         <p className="absolute bottom-2 left-2 rounded bg-background/80 px-2 py-1 text-sm text-foreground">
           <ParticipantName name={participant.displayName} />
         </p>

@@ -205,8 +205,8 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 3
 
-- [ ] T087 [US3] Copy-link control (Lucide `Copy`, Tooltip, `aria-label`) always on the control bar in `apps/web/src/features/copy-invite-link/ui/copy-invite-button.tsx`
-- [ ] T088 [US3] Write `window.location.href` to clipboard and show «Ссылка скопирована» in `apps/web/src/features/copy-invite-link/model/copy-invite.ts`
+- [X] T087 [US3] Copy-link control (Lucide `Copy`, Tooltip, `aria-label`) always on the control bar in `apps/web/src/features/copy-invite-link/ui/copy-invite-button.tsx`
+- [X] T088 [US3] Write `window.location.href` to clipboard and show «Ссылка скопирована» in `apps/web/src/features/copy-invite-link/model/copy-invite.ts`
 
 **Checkpoint**: Invite link is copyable without using the address bar
 
@@ -220,8 +220,8 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 5
 
-- [ ] T089 [US5] Map `ROOM_FULL` ack to full-room state (not a blank room) in `apps/web/src/features/enter-room/ui/room-full-state.tsx` with «Комната заполнена» and «Повторить вход» retrying the same id
-- [ ] T090 [US5] Integration test: 4 joins then 5th `ROOM_FULL`; two overlapping `tryJoin` on 3-occupied room admits one in `libs/api/infra-memory/src/lib/in-memory-room-registry.spec.ts`
+- [X] T089 [US5] Map `ROOM_FULL` ack to full-room state (not a blank room) in `apps/web/src/features/enter-room/ui/room-full-state.tsx` with «Комната заполнена» and «Повторить вход» retrying the same id
+- [X] T090 [US5] Integration test: 4 joins then 5th `ROOM_FULL`; two overlapping `tryJoin` on 3-occupied room admits one in `libs/api/infra-memory/src/lib/in-memory-room-registry.spec.ts`
 
 **Checkpoint**: Cap is authoritative and visible
 
@@ -235,10 +235,10 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 7
 
-- [ ] T091 [US7] Mic/camera icon toggles with Tooltip + `aria-label` in `apps/web/src/widgets/control-bar/ui/control-bar.tsx` using Lucide `Mic`/`MicOff`/`Video`/`VideoOff`
-- [ ] T092 [US7] Camera off calls `stop()` on the video track and `replaceTrack(null)` in `libs/web/media/src/lib/local-media.ts` and `libs/web/webrtc/src/lib/mesh-call-session.ts`; camera on re-acquires
-- [ ] T093 [US7] Publish `media:state` and render remote `media:state-changed` as MicOff overlay + silhouette in `apps/web/src/entities/participant/ui/media-indicators.tsx` (state not by color alone)
-- [ ] T094 [US7] On `ended`/device lost, set that track off with no in-app recovery UI in `libs/web/media/src/lib/local-media.ts`
+- [X] T091 [US7] Mic/camera icon toggles with Tooltip + `aria-label` in `apps/web/src/widgets/control-bar/ui/control-bar.tsx` using Lucide `Mic`/`MicOff`/`Video`/`VideoOff`
+- [X] T092 [US7] Camera off calls `stop()` on the video track and `replaceTrack(null)` in `libs/web/media/src/lib/local-media.ts` and `libs/web/webrtc/src/lib/mesh-call-session.ts`; camera on re-acquires
+- [X] T093 [US7] Publish `media:state` and render remote `media:state-changed` as MicOff overlay + silhouette in `apps/web/src/entities/participant/ui/media-indicators.tsx` (state not by color alone)
+- [X] T094 [US7] On `ended`/device lost, set that track off with no in-app recovery UI in `libs/web/media/src/lib/local-media.ts`
 
 **Checkpoint**: Privacy toggles match FR-015–FR-020
 

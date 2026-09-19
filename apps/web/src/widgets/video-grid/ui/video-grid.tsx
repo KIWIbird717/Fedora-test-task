@@ -9,12 +9,14 @@ export function VideoGrid({
   remotes,
   localStream,
   localCameraEnabled,
+  localMicrophoneEnabled,
   remoteStreams,
 }: {
   self: ParticipantDto | undefined;
   remotes: ParticipantDto[];
   localStream: MediaStream | undefined;
   localCameraEnabled: boolean;
+  localMicrophoneEnabled: boolean;
   remoteStreams: Record<string, MediaStream>;
 }) {
   const isAlone = remotes.length === 0;
@@ -52,6 +54,7 @@ export function VideoGrid({
           participant={self}
           stream={localStream}
           cameraEnabled={localCameraEnabled}
+          microphoneEnabled={localMicrophoneEnabled}
         />
       ) : null}
     </section>

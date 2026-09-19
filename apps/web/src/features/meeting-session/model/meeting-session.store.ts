@@ -179,6 +179,21 @@ export function clearMeetingMedia(): void {
   emit();
 }
 
+export function updateMeetingParticipantMedia(
+  participantId: string,
+  media: { microphoneEnabled: boolean; cameraEnabled: boolean },
+): void {
+  state = {
+    ...state,
+    participants: state.participants.map((participant) =>
+      participant.id === participantId
+        ? { ...participant, ...media }
+        : participant,
+    ),
+  };
+  emit();
+}
+
 export function addMeetingParticipant(participant: ParticipantDto): void {
   if (state.participants.some((existing) => existing.id === participant.id)) {
     return;

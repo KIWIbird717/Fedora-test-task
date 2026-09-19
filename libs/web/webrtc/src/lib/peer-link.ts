@@ -28,6 +28,8 @@ export class PeerLink {
   private readonly pc: RTCPeerConnection;
   private readonly remoteStream = new MediaStream();
   private readonly pendingIce: RTCIceCandidateInit[] = [];
+  private readonly audioSender: RTCRtpSender;
+  private readonly videoSender: RTCRtpSender;
   private remoteDescriptionSet = false;
   private closed = false;
   private disconnectTimer: ReturnType<typeof setTimeout> | undefined;
@@ -54,11 +56,24 @@ export class PeerLink {
     this.pc.oniceconnectionstatechange = () => {
       this.emitFromIceState();
     };
-    this.attachLocalTracks();
+    const senders = this.attachLocalTracks();
+    this.audioSender = senders.audio;
+    this.videoSender = senders.video;
     options.onState('connecting');
     if (options.role === 'offerer') {
       void this.createAndSendOffer();
     }
+  }
+
+  async replaceTrack(
+    kind: 'audio' | 'video',
+    track: MediaStreamTrack | null,
+  ): Promise<void> {
+    if (this.closed) {
+      return;
+    }
+    const sender = kind === 'audio' ? this.audioSender : this.videoSender;
+    await sender.replaceTrack(track);
   }
 
   async handleRemoteOffer(sdp: string): Promise<void> {
@@ -119,20 +134,18 @@ export class PeerLink {
     this.options.onState('closed');
   }
 
-  private attachLocalTracks(): void {
+  private attachLocalTracks(): { audio: RTCRtpSender; video: RTCRtpSender } {
     const stream = this.options.localStream ?? new MediaStream();
     const audio = stream.getAudioTracks()[0];
     const video = stream.getVideoTracks()[0];
-    if (audio) {
-      this.pc.addTrack(audio, stream);
-    } else {
-      this.pc.addTransceiver('audio', { direction: 'recvonly' });
-    }
-    if (video) {
-      this.pc.addTrack(video, stream);
-    } else {
-      this.pc.addTransceiver('video', { direction: 'recvonly' });
-    }
+    return {
+      audio: audio
+        ? this.pc.addTrack(audio, stream)
+        : this.pc.addTransceiver('audio', { direction: 'sendrecv' }).sender,
+      video: video
+        ? this.pc.addTrack(video, stream)
+        : this.pc.addTransceiver('video', { direction: 'sendrecv' }).sender,
+    };
   }
 
   private async createAndSendOffer(): Promise<void> {

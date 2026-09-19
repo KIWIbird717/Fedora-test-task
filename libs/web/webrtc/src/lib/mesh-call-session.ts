@@ -91,6 +91,18 @@ export class MeshCallSession {
     }
   }
 
+  replaceTrack(
+    kind: 'audio' | 'video',
+    track: MediaStreamTrack | null,
+  ): void {
+    if (this.disposed) {
+      return;
+    }
+    for (const link of this.peers.values()) {
+      void link.replaceTrack(kind, track);
+    }
+  }
+
   removePeer(participantId: string): void {
     const link = this.peers.get(participantId);
     if (!link) {

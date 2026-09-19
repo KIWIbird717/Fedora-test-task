@@ -6,11 +6,12 @@ import {
 } from '@fedora-meetings/web-realtime';
 import { useEffect } from 'react';
 import { getActiveRoomClient } from './active-room-client';
+import { setActiveMeshSession } from './active-mesh-session';
+import { publishLocalMedia } from './toggle-media';
 import {
   clearMeetingMedia,
   getMeetingSessionSnapshot,
   removePeerMedia,
-  setLocalMedia,
   setPeerMediaState,
   setRemoteStream,
   useMeetingSession,
@@ -48,6 +49,7 @@ export function useMeshCall(): void {
         setPeerMediaState(id, state);
       },
     });
+    setActiveMeshSession(mesh);
 
     let cancelled = false;
     const unsubscribers: Array<() => void> = [];
@@ -61,24 +63,16 @@ export function useMeshCall(): void {
         return;
       }
       mesh.attachLocal(media.stream);
-      setLocalMedia({
-        stream: media.stream,
-        microphoneEnabled: media.microphoneEnabled,
-        cameraEnabled: media.cameraEnabled,
-      });
-      try {
-        await roomClient.updateMedia({
-          microphoneEnabled: media.microphoneEnabled,
-          cameraEnabled: media.cameraEnabled,
-        });
-      } catch {
-        // Stay in the room even if the media-state ack cannot be delivered.
-      }
+      publishLocalMedia(media);
       if (cancelled) {
         return;
       }
 
       unsubscribers.push(
+        localMedia.onDeviceLost((kind, state) => {
+          mesh.replaceTrack(kind, null);
+          publishLocalMedia(state);
+        }),
         roomClient.onParticipantJoined((participant) => {
           if (participant.id !== selfId) {
             mesh.addPeer(participant.id, 'offerer');
@@ -103,6 +97,7 @@ export function useMeshCall(): void {
       for (const unsubscribe of unsubscribers) {
         unsubscribe();
       }
+      setActiveMeshSession(undefined);
       mesh.dispose();
       localMedia.release();
       clearMeetingMedia();

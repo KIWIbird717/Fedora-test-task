@@ -1,5 +1,6 @@
 import type { ParticipantDto } from '@fedora-meetings/contracts-realtime';
 import { useEffect, useRef } from 'react';
+import { MediaIndicators } from './media-indicators';
 import { ParticipantName } from './participant-name';
 import { ParticipantSilhouette } from './participant-silhouette';
 
@@ -13,7 +14,7 @@ export function RemoteTile({
   onAutoplayBlocked: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hasVideo = hasLiveVideo(stream);
+  const showVideo = participant.cameraEnabled && hasLiveVideo(stream);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -35,7 +36,7 @@ export function RemoteTile({
         <video
           ref={videoRef}
           className={
-            hasVideo
+            showVideo
               ? 'h-full min-h-64 w-full object-cover'
               : 'pointer-events-none absolute h-px w-px opacity-0'
           }
@@ -44,11 +45,15 @@ export function RemoteTile({
           data-remote="true"
         />
       ) : null}
-      {!hasVideo ? (
+      {!showVideo ? (
         <div className="flex min-h-64 h-full w-full items-center justify-center bg-secondary">
           <ParticipantSilhouette className="h-20 w-20" />
         </div>
       ) : null}
+      <MediaIndicators
+        microphoneEnabled={participant.microphoneEnabled}
+        cameraEnabled={participant.cameraEnabled}
+      />
       <p className="absolute bottom-2 left-2 rounded bg-background/80 px-2 py-1 text-sm text-foreground">
         <ParticipantName name={participant.displayName} />
       </p>

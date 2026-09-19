@@ -33,6 +33,14 @@ class FakeTrack {
   }
 }
 
+class FakeSender {
+  constructor(public track: FakeTrack | null) {}
+
+  readonly replaceTrack = vi.fn(async (track: FakeTrack | null) => {
+    this.track = track;
+  });
+}
+
 class FakePeerConnection {
   static instances: FakePeerConnection[] = [];
 
@@ -43,8 +51,17 @@ class FakePeerConnection {
   iceConnectionState = 'new';
   localDescription: { type: string; sdp: string } | null = null;
   remoteDescription: { type: string; sdp: string } | null = null;
-  readonly addTrack = vi.fn();
-  readonly addTransceiver = vi.fn();
+  readonly senders: FakeSender[] = [];
+  readonly addTrack = vi.fn((track: FakeTrack) => {
+    const sender = new FakeSender(track);
+    this.senders.push(sender);
+    return sender;
+  });
+  readonly addTransceiver = vi.fn(() => {
+    const sender = new FakeSender(null);
+    this.senders.push(sender);
+    return { sender };
+  });
   readonly addIceCandidate = vi.fn(async () => undefined);
   readonly createOffer = vi.fn(async () => ({
     type: 'offer' as const,
@@ -207,5 +224,30 @@ describe('MeshCallSession', () => {
 
     signaling.emitOffer('peer-3', 'late-offer');
     expect(FakePeerConnection.instances).toHaveLength(2);
+  });
+
+  it('replaces the video sender track on every peer', async () => {
+    const session = new MeshCallSession({
+      signaling: createFakeSignaling(),
+      iceServers: [],
+      onRemoteStream: vi.fn(),
+      onPeerState: vi.fn(),
+    });
+    const local = new FakeMediaStream([
+      new FakeTrack('audio'),
+      new FakeTrack('video'),
+    ]);
+    session.attachLocal(local as unknown as MediaStream);
+    session.addPeer('peer-1', 'answerer');
+    session.addPeer('peer-2', 'answerer');
+
+    session.replaceTrack('video', null);
+
+    for (const connection of FakePeerConnection.instances) {
+      const videoSender = connection.senders[1];
+      expect(videoSender?.replaceTrack).toHaveBeenCalledWith(null);
+    }
+
+    session.dispose();
   });
 });
