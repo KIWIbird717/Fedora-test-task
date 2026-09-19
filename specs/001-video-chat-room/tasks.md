@@ -111,11 +111,11 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 1
 
-- [ ] T058 [US1] Build start name field + client rules (trim; truncate to 30; charset `letters/digits/spaces/hyphens/apostrophes`) in `apps/web/src/features/enter-room/ui/display-name-field.tsx`
-- [ ] T059 [US1] Show «Введите имя» for empty/whitespace and charset hint «Имя может содержать буквы, цифры, пробелы, дефис и апостроф» in `apps/web/src/features/enter-room/ui/display-name-field.tsx`
-- [ ] T060 [US1] Hold display name in session memory only (not localStorage) in `apps/web/src/features/enter-room/model/display-name.store.ts`
-- [ ] T061 [US1] Compose start screen (name + «Создать комнату» disabled until valid) in `apps/web/src/pages/start-page.tsx` using `libs/web/ui` Input/Button
-- [ ] T062 [US1] Add name gate on `apps/web/src/pages/room-page.tsx` with «Войти» using the same field (invite path); escape name at render (no `dangerouslySetInnerHTML`)
+- [X] T058 [US1] Build start name field + client rules (trim; truncate to 30; charset `letters/digits/spaces/hyphens/apostrophes`) in `apps/web/src/features/enter-room/ui/display-name-field.tsx`
+- [X] T059 [US1] Show «Введите имя» for empty/whitespace and charset hint «Имя может содержать буквы, цифры, пробелы, дефис и апостроф» in `apps/web/src/features/enter-room/ui/display-name-field.tsx`
+- [X] T060 [US1] Hold display name in session memory only (not localStorage) in `apps/web/src/features/enter-room/model/display-name.store.ts`
+- [X] T061 [US1] Compose start screen (name + «Создать комнату» disabled until valid) in `apps/web/src/pages/start-page.tsx` using `libs/web/ui` Input/Button
+- [X] T062 [US1] Add name gate on `apps/web/src/pages/room-page.tsx` with «Войти» using the same field (invite path); escape name at render (no `dangerouslySetInnerHTML`)
 
 **Checkpoint**: Name validation is independently testable with one user; room create/join may still be stubbed until US2/US4
 
@@ -129,11 +129,11 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 2
 
-- [ ] T063 [US2] Call `POST /api/rooms` via TanStack Query mutation in `apps/web/src/features/enter-room/api/mint-room.ts` using generated `apps/web/src/shared/api/schema.d.ts`
-- [ ] T064 [US2] On 201, navigate to `/room/$roomId` then `room:join` in `apps/web/src/features/enter-room/model/enter-room.ts`; map `SERVICE_AT_CAPACITY` to «Сервис переполнен. Попробуйте позже.»
-- [ ] T065 [US2] Show connecting state spinner + «Подключение…» in `apps/web/src/features/enter-room/ui/connecting-indicator.tsx` until join ack, room view, or a named failure (never a blank screen)
-- [ ] T066 [US2] After join, show self-view PIP + hint «Пока никого нет. Скопируйте ссылку, чтобы пригласить участников.» in `apps/web/src/widgets/video-grid/ui/video-grid.tsx` (local preview may be a placeholder until US6)
-- [ ] T067 [US2] Integration test mint + first join creates exactly one in-memory room in `apps/api/src/http/rooms.controller.spec.ts` and `apps/api/src/realtime/rooms.gateway.spec.ts`
+- [X] T063 [US2] Call `POST /api/rooms` via TanStack Query mutation in `apps/web/src/features/enter-room/api/mint-room.ts` using generated `apps/web/src/shared/api/schema.d.ts`
+- [X] T064 [US2] On 201, navigate to `/room/$roomId` then `room:join` in `apps/web/src/features/enter-room/model/enter-room.ts`; map `SERVICE_AT_CAPACITY` to «Сервис переполнен. Попробуйте позже.»
+- [X] T065 [US2] Show connecting state spinner + «Подключение…» in `apps/web/src/features/enter-room/ui/connecting-indicator.tsx` until join ack, room view, or a named failure (never a blank screen)
+- [X] T066 [US2] After join, show self-view PIP + hint «Пока никого нет. Скопируйте ссылку, чтобы пригласить участников.» in `apps/web/src/widgets/video-grid/ui/video-grid.tsx` (local preview may be a placeholder until US6)
+- [X] T067 [US2] Integration test mint + first join creates exactly one in-memory room in `apps/api/src/http/rooms.controller.spec.ts` and `apps/api/src/realtime/rooms.gateway.spec.ts`
 
 **Checkpoint**: One user can create and occupy a room
 
@@ -147,11 +147,11 @@ Nx layout from plan.md: `apps/api`, `apps/web`, `apps/web-e2e`, `libs/api/*`, `l
 
 ### Implementation for User Story 4
 
-- [ ] T068 [US4] Parse `roomId` from TanStack Router in `apps/web/src/pages/room-page.tsx` and join via `room:join` after valid name (FR-004/FR-005)
-- [ ] T069 [US4] Apply join ack: self `participantId` (never shown), roster, authored `messages`, `iceServers` in `apps/web/src/features/meeting-session/model/meeting-session.store.ts`
-- [ ] T070 [US4] Handle `room:participant-joined` / `room:participant-left` in `libs/web/realtime/src/lib/room-client.ts` updating the store
-- [ ] T071 [US4] Allow duplicate display names in UI (both visible as the same name; distinguish only by hidden id) in `apps/web/src/entities/participant/ui/participant-name.tsx`
-- [ ] T072 [US4] Integration test: missing id creates room; existing id joins; two «Алекс» both admitted in `apps/api/src/realtime/rooms.gateway.spec.ts`
+- [X] T068 [US4] Parse `roomId` from TanStack Router in `apps/web/src/pages/room-page.tsx` and join via `room:join` after valid name (FR-004/FR-005)
+- [X] T069 [US4] Apply join ack: self `participantId` (never shown), roster, authored `messages`, `iceServers` in `apps/web/src/features/meeting-session/model/meeting-session.store.ts`
+- [X] T070 [US4] Handle `room:participant-joined` / `room:participant-left` in `libs/web/realtime/src/lib/room-client.ts` updating the store
+- [X] T071 [US4] Allow duplicate display names in UI (both visible as the same name; distinguish only by hidden id) in `apps/web/src/entities/participant/ui/participant-name.tsx`
+- [X] T072 [US4] Integration test: missing id creates room; existing id joins; two «Алекс» both admitted in `apps/api/src/realtime/rooms.gateway.spec.ts`
 
 **Checkpoint**: Two sessions can share a room by URL (media may still be absent)
 

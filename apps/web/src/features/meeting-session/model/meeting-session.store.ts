@@ -3,6 +3,7 @@ import type {
   ChatMessageDto,
   IceServerDto,
   ParticipantDto,
+  RoomJoinResult,
 } from '@fedora-meetings/contracts-realtime';
 
 export type MeetingConnectionState =
@@ -69,6 +70,41 @@ export function setMeetingMessages(messages: ChatMessageDto[]): void {
 
 export function setMeetingIceServers(iceServers: IceServerDto[]): void {
   state = { ...state, iceServers };
+  emit();
+}
+
+export function applyJoinAck(result: RoomJoinResult): void {
+  state = {
+    connection: {
+      status: 'in-room',
+      roomId: result.roomId,
+      participantId: result.participantId,
+    },
+    participants: result.participants,
+    messages: result.messages,
+    iceServers: result.iceServers,
+  };
+  emit();
+}
+
+export function addMeetingParticipant(participant: ParticipantDto): void {
+  if (state.participants.some((existing) => existing.id === participant.id)) {
+    return;
+  }
+  state = {
+    ...state,
+    participants: [...state.participants, participant],
+  };
+  emit();
+}
+
+export function removeMeetingParticipant(participantId: string): void {
+  state = {
+    ...state,
+    participants: state.participants.filter(
+      (participant) => participant.id !== participantId,
+    ),
+  };
   emit();
 }
 

@@ -25,6 +25,11 @@ import type { Socket } from 'socket.io-client';
 
 const ACK_TIMEOUT_MS = 10_000;
 
+export type RosterWatchers = {
+  onParticipantJoined: (payload: ParticipantDto) => void;
+  onParticipantLeft: (payload: ParticipantLeftDto) => void;
+};
+
 export type RoomClient = {
   join(payload: RoomJoinPayload): Promise<Ack<RoomJoinResult>>;
   leave(): Promise<Ack<RoomLeaveResult>>;
@@ -35,6 +40,7 @@ export type RoomClient = {
   sendIceCandidate(payload: SignalIcePayload): Promise<Ack<SignalRelayResult>>;
   onParticipantJoined(handler: (payload: ParticipantDto) => void): () => void;
   onParticipantLeft(handler: (payload: ParticipantLeftDto) => void): () => void;
+  watchRoster(watchers: RosterWatchers): () => void;
   onChatMessage(handler: (payload: ChatMessageDto) => void): () => void;
   onChatSystem(handler: (payload: SystemEventDto) => void): () => void;
   onMediaStateChanged(handler: (payload: MediaStateChangedDto) => void): () => void;
@@ -57,6 +63,22 @@ export function createRoomClient(socket: Socket): RoomClient {
       listen(socket, realtimeEvents.roomParticipantJoined, handler),
     onParticipantLeft: (handler) =>
       listen(socket, realtimeEvents.roomParticipantLeft, handler),
+    watchRoster: (watchers) => {
+      const unwatchJoined = listen(
+        socket,
+        realtimeEvents.roomParticipantJoined,
+        watchers.onParticipantJoined,
+      );
+      const unwatchLeft = listen(
+        socket,
+        realtimeEvents.roomParticipantLeft,
+        watchers.onParticipantLeft,
+      );
+      return () => {
+        unwatchJoined();
+        unwatchLeft();
+      };
+    },
     onChatMessage: (handler) => listen(socket, realtimeEvents.chatMessage, handler),
     onChatSystem: (handler) => listen(socket, realtimeEvents.chatSystem, handler),
     onMediaStateChanged: (handler) =>

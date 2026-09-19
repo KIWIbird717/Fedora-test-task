@@ -21,14 +21,17 @@ import { SocketParticipantMap } from './realtime/socket-participant.map';
 import { SocketRoomBroadcaster } from './realtime/socket-room.broadcaster';
 
 const env = loadEnv();
-const roomRegistry = new InMemoryRoomRegistry(env.ROOM_CEILING);
 const iceServers = env.STUN_URLS.map((urls) => ({ urls }));
 
 @Module({
   controllers: [HealthController, RoomsController],
   providers: [
     { provide: APP_ENV, useValue: env },
-    { provide: ROOM_REGISTRY, useValue: roomRegistry },
+    {
+      provide: ROOM_REGISTRY,
+      useFactory: (appEnv: AppEnv) => new InMemoryRoomRegistry(appEnv.ROOM_CEILING),
+      inject: [APP_ENV],
+    },
     SocketParticipantMap,
     SocketRoomBroadcaster,
     {
